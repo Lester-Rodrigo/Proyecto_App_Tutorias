@@ -34,7 +34,7 @@ val InterFont = FontFamily(
     )
 )
 
-val TutorTypography = Typography(
+val TutorLinkTypography = Typography(
     displaySmall = TextStyle(
         fontFamily = OutfitFont,
         fontWeight = FontWeight.Bold,
