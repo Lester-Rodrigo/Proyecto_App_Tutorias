@@ -5,14 +5,11 @@ import com.example.app_tutorias.ui.components.ScreenPlaceholder
 
 @Composable
 fun SettingsScreen(
-    onBack: () -> Unit,
     onLogout: () -> Unit
 ) {
     ScreenPlaceholder(
         title = "Configuración",
-        primaryButtonText = "Volver al inicio",
-        onPrimaryClick = onBack,
-        secondaryButtonText = "Cerrar sesión",
-        onSecondaryClick = onLogout
+        primaryButtonText = "Cerrar sesión",
+        onPrimaryClick = onLogout
     )
 }

@@ -4,12 +4,8 @@ import androidx.compose.runtime.Composable
 import com.example.app_tutorias.ui.components.ScreenPlaceholder
 
 @Composable
-fun CalendarScreen(
-    onBack: () -> Unit
-) {
+fun CalendarScreen() {
     ScreenPlaceholder(
-        title = "Calendario",
-        primaryButtonText = "Volver al inicio",
-        onPrimaryClick = onBack
+        title = "Calendario"
     )
 }

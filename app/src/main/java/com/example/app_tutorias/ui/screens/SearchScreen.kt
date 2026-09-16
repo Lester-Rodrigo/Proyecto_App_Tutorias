@@ -4,12 +4,8 @@ import androidx.compose.runtime.Composable
 import com.example.app_tutorias.ui.components.ScreenPlaceholder
 
 @Composable
-fun SearchScreen(
-    onBack: () -> Unit
-) {
+fun SearchScreen() {
     ScreenPlaceholder(
-        title = "Buscar",
-        primaryButtonText = "Volver al inicio",
-        onPrimaryClick = onBack
+        title = "Buscar"
     )
 }
