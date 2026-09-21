@@ -1,0 +1,93 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "TutorLink: Ejecutar en Android",
+            "type": "shell",
+            "command": "powershell.exe",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}\\scripts\\run-android.ps1",
+                "-AvdName",
+                "${input:avdName}"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "dedicated",
+                "clear": true
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "TutorLink: Compilar APK debug",
+            "type": "shell",
+            "command": "powershell.exe",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}\\scripts\\invoke-gradle.ps1",
+                "-Task",
+                "assembleDebug"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}",
+                "env": {
+                    "ANDROID_HOME": "${env:LOCALAPPDATA}\\Android\\Sdk"
+                }
+            },
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "TutorLink: Pruebas unitarias",
+            "type": "shell",
+            "command": "powershell.exe",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                "${workspaceFolder}\\scripts\\invoke-gradle.ps1",
+                "-Task",
+                "testDebugUnitTest"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}",
+                "env": {
+                    "ANDROID_HOME": "${env:LOCALAPPDATA}\\Android\\Sdk"
+                }
+            },
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "TutorLink: Listar emuladores",
+            "type": "shell",
+            "command": "& '${env:LOCALAPPDATA}\\Android\\Sdk\\emulator\\emulator.exe' -list-avds",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        }
+    ],
+    "inputs": [
+        {
+            "id": "avdName",
+            "type": "promptString",
+            "description": "Nombre del emulador Android",
+            "default": "Pixel_10a"
+        }
+    ]
+}
