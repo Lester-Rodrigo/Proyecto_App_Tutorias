@@ -24,6 +24,13 @@ sealed class Destination(
         label = "Calendario"
     )
 
+    data object TutorDetail : Destination(
+        route = "tutor/{tutorId}",
+        label = "Detalle del tutor"
+    ) {
+        fun createRoute(tutorId: String): String = "tutor/$tutorId"
+    }
+
     data object Settings : Destination(
         route = "settings",
         label = "Configuración"
