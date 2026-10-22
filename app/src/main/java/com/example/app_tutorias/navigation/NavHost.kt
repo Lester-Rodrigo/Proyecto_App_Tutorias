@@ -13,7 +13,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.app_tutorias.data.TutoringStatus
 import com.example.app_tutorias.ui.TutorLinkViewModel
 import com.example.app_tutorias.ui.components.TutorLinkBottomBar
 import com.example.app_tutorias.ui.components.TutorLinkTopBar
@@ -29,7 +28,10 @@ import com.example.app_tutorias.ui.theme.TutorLinkBackground
 fun TutorLinkNavHost() {
     val navController = rememberNavController()
     val viewModel: TutorLinkViewModel = viewModel()
-    val sessions by viewModel.sessions.collectAsStateWithLifecycle()
+    val homeUiState by viewModel.homeUiState.collectAsStateWithLifecycle()
+    val searchUiState by viewModel.searchUiState.collectAsStateWithLifecycle()
+    val calendarUiState by viewModel.calendarUiState.collectAsStateWithLifecycle()
+    val bookingUiState by viewModel.bookingUiState.collectAsStateWithLifecycle()
     val backStackEntry by
     navController.currentBackStackEntryAsState()
     val currentRoute =
@@ -94,13 +96,10 @@ fun TutorLinkNavHost() {
                 )
             }
             composable(Destination.Home.route) {
-                val nextSession = sessions
-                    .filter { it.status == TutoringStatus.UPCOMING }
-                    .minWithOrNull(compareBy({ it.date }, { it.time }))
                 HomeScreen(
-                    categories = viewModel.categories,
-                    recommendedTutors = viewModel.tutors.take(3),
-                    nextSession = nextSession,
+                    categories = homeUiState.categories,
+                    recommendedTutors = homeUiState.recommendedTutors,
+                    nextSession = homeUiState.nextSession,
                     onSearchClick = {
                         navController.navigate(Destination.Search.route) {
                             launchSingleTop = true
@@ -120,8 +119,10 @@ fun TutorLinkNavHost() {
             }
             composable(Destination.Search.route) {
                 SearchScreen(
-                    tutors = viewModel.tutors,
-                    categories = viewModel.categories,
+                    uiState = searchUiState,
+                    onQueryChanged = viewModel::onSearchQueryChanged,
+                    onClearQuery = viewModel::clearSearchQuery,
+                    onCategorySelected = viewModel::onSearchCategorySelected,
                     onTutorClick = { tutor ->
                         navController.navigate(
                             Destination.TutorDetail.createRoute(tutor.id)
@@ -132,7 +133,10 @@ fun TutorLinkNavHost() {
                 )
             }
             composable(Destination.Calendar.route) {
-                CalendarScreen(sessions = sessions)
+                CalendarScreen(
+                    uiState = calendarUiState,
+                    onFilterSelected = viewModel::onSessionFilterSelected
+                )
             }
             composable(
                 route = Destination.TutorDetail.route,
@@ -146,8 +150,16 @@ fun TutorLinkNavHost() {
                 if (tutor != null) {
                     TutorDetailScreen(
                         tutor = tutor,
+                        uiState = bookingUiState,
+                        onBookingStarted = {
+                            viewModel.beginBooking(tutor.id, entry.id)
+                        },
+                        onTopicChanged = viewModel::onBookingTopicChanged,
+                        onDateChanged = viewModel::onBookingDateChanged,
+                        onTimeChanged = viewModel::onBookingTimeChanged,
+                        onNotesChanged = viewModel::onBookingNotesChanged,
+                        onSubmit = { viewModel.submitBooking(tutor) },
                         onBack = { navController.popBackStack() },
-                        onReservationConfirmed = viewModel::addReservation,
                         onViewCalendar = {
                             navController.navigate(Destination.Calendar.route) {
                                 popUpTo(Destination.Home.route) {

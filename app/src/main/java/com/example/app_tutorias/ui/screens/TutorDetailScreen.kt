@@ -31,12 +31,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -46,47 +42,42 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.app_tutorias.R
 import com.example.app_tutorias.data.BookingFieldError
-import com.example.app_tutorias.data.BookingFormData
 import com.example.app_tutorias.data.MAX_NOTES_LENGTH
 import com.example.app_tutorias.data.MockData
 import com.example.app_tutorias.data.Tutor
-import com.example.app_tutorias.data.TutoringSession
-import com.example.app_tutorias.data.TutoringStatus
-import com.example.app_tutorias.data.validateBookingForm
+import com.example.app_tutorias.ui.BookingUiState
 import com.example.app_tutorias.ui.components.TutorAvatar
 import com.example.app_tutorias.ui.theme.TutorFavoriteBackground
 import com.example.app_tutorias.ui.theme.TutorLinkGreenActive
 import com.example.app_tutorias.ui.theme.TutorLinkTextSecondary
 import com.example.app_tutorias.ui.theme.TutorLinkTheme
-import java.time.LocalDate
-import java.time.LocalTime
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TutorDetailScreen(
     tutor: Tutor,
+    uiState: BookingUiState,
+    onBookingStarted: () -> Unit,
+    onTopicChanged: (String) -> Unit,
+    onDateChanged: (String) -> Unit,
+    onTimeChanged: (String) -> Unit,
+    onNotesChanged: (String) -> Unit,
+    onSubmit: () -> Unit,
     onBack: () -> Unit,
-    onReservationConfirmed: (TutoringSession) -> Unit,
     onViewCalendar: () -> Unit
 ) {
-    var topic by rememberSaveable(tutor.id) { mutableStateOf("") }
-    var date by rememberSaveable(tutor.id) { mutableStateOf("") }
-    var time by rememberSaveable(tutor.id) { mutableStateOf("") }
-    var notes by rememberSaveable(tutor.id) { mutableStateOf("") }
-    var topicTouched by rememberSaveable(tutor.id) { mutableStateOf(false) }
-    var dateTouched by rememberSaveable(tutor.id) { mutableStateOf(false) }
-    var timeTouched by rememberSaveable(tutor.id) { mutableStateOf(false) }
-    var notesTouched by rememberSaveable(tutor.id) { mutableStateOf(false) }
-    var isSubmitting by rememberSaveable(tutor.id) { mutableStateOf(false) }
-    var reservationComplete by rememberSaveable(tutor.id) { mutableStateOf(false) }
-
-    val form = BookingFormData(topic = topic, date = date, time = time, notes = notes)
-    val validation = validateBookingForm(form)
     val snackbarHostState = remember { SnackbarHostState() }
-    val coroutineScope = rememberCoroutineScope()
     val confirmationMessage = stringResource(R.string.booking_success)
+
+    LaunchedEffect(tutor.id) {
+        onBookingStarted()
+    }
+
+    LaunchedEffect(uiState.reservationComplete) {
+        if (uiState.reservationComplete) {
+            snackbarHostState.showSnackbar(confirmationMessage)
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -152,68 +143,69 @@ fun TutorDetailScreen(
             }
             item {
                 BookingTextField(
-                    value = topic,
-                    onValueChange = {
-                        topic = it
-                        topicTouched = true
-                    },
+                    value = uiState.form.topic,
+                    onValueChange = onTopicChanged,
                     label = stringResource(R.string.booking_topic),
                     placeholder = stringResource(R.string.booking_topic_hint),
-                    error = if (topicTouched) validation.topicError.errorMessage() else null
+                    error = if (uiState.topicTouched) {
+                        uiState.validation.topicError.errorMessage()
+                    } else {
+                        null
+                    }
                 )
             }
             item {
                 BookingTextField(
-                    value = date,
-                    onValueChange = {
-                        date = it
-                        dateTouched = true
-                    },
+                    value = uiState.form.date,
+                    onValueChange = onDateChanged,
                     label = stringResource(R.string.booking_date),
                     placeholder = stringResource(R.string.date_hint),
-                    error = if (dateTouched) validation.dateError.errorMessage() else null,
+                    error = if (uiState.dateTouched) {
+                        uiState.validation.dateError.errorMessage()
+                    } else {
+                        null
+                    },
                     keyboardType = KeyboardType.Number
                 )
             }
             item {
                 BookingTextField(
-                    value = time,
-                    onValueChange = {
-                        time = it
-                        timeTouched = true
-                    },
+                    value = uiState.form.time,
+                    onValueChange = onTimeChanged,
                     label = stringResource(R.string.booking_time),
                     placeholder = stringResource(R.string.time_hint),
-                    error = if (timeTouched) validation.timeError.errorMessage() else null,
+                    error = if (uiState.timeTouched) {
+                        uiState.validation.timeError.errorMessage()
+                    } else {
+                        null
+                    },
                     keyboardType = KeyboardType.Number
                 )
             }
             item {
                 OutlinedTextField(
-                    value = notes,
-                    onValueChange = {
-                        notes = it
-                        notesTouched = true
-                    },
+                    value = uiState.form.notes,
+                    onValueChange = onNotesChanged,
                     modifier = Modifier.fillMaxWidth(),
                     label = { Text(stringResource(R.string.booking_notes)) },
                     placeholder = { Text(stringResource(R.string.booking_notes_hint)) },
                     minLines = 3,
                     maxLines = 5,
-                    isError = notesTouched && validation.notesError != null,
+                    isError = uiState.notesTouched &&
+                        uiState.validation.notesError != null,
                     supportingText = {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                text = if (notesTouched) {
-                                    validation.notesError.errorMessage().orEmpty()
+                                text = if (uiState.notesTouched) {
+                                    uiState.validation.notesError.errorMessage().orEmpty()
                                 } else {
                                     ""
                                 }
                             )
-                            Text("${notes.length}/$MAX_NOTES_LENGTH")
+                            Text("${uiState.form.notes.length}/$MAX_NOTES_LENGTH")
                         }
                     },
                     shape = MaterialTheme.shapes.medium
@@ -221,41 +213,21 @@ fun TutorDetailScreen(
             }
             item {
                 Button(
-                    onClick = {
-                        if (!validation.isValid || isSubmitting || reservationComplete) return@Button
-                        isSubmitting = true
-                        coroutineScope.launch {
-                            delay(700)
-                            val session = TutoringSession(
-                                id = "session-${tutor.id}-$date-$time",
-                                tutorId = tutor.id,
-                                tutorName = tutor.name,
-                                subject = topic.trim(),
-                                date = LocalDate.parse(date),
-                                time = LocalTime.parse(time),
-                                notes = notes.trim(),
-                                status = TutoringStatus.UPCOMING
-                            )
-                            onReservationConfirmed(session)
-                            isSubmitting = false
-                            reservationComplete = true
-                            snackbarHostState.showSnackbar(confirmationMessage)
-                        }
-                    },
-                    enabled = validation.isValid && !isSubmitting && !reservationComplete,
+                    onClick = onSubmit,
+                    enabled = uiState.canSubmit,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(52.dp),
                     shape = MaterialTheme.shapes.medium
                 ) {
-                    if (isSubmitting) {
+                    if (uiState.isSubmitting) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(22.dp),
                             strokeWidth = 2.dp
                         )
                     } else {
                         Text(
-                            text = if (reservationComplete) {
+                            text = if (uiState.reservationComplete) {
                                 stringResource(R.string.booking_confirmed)
                             } else {
                                 stringResource(R.string.book_tutoring)
@@ -264,7 +236,7 @@ fun TutorDetailScreen(
                     }
                 }
             }
-            if (reservationComplete) {
+            if (uiState.reservationComplete) {
                 item {
                     OutlinedButton(
                         onClick = onViewCalendar,
@@ -363,8 +335,14 @@ private fun TutorDetailPreview() {
     TutorLinkTheme {
         TutorDetailScreen(
             tutor = MockData.tutors.first(),
+            uiState = BookingUiState(),
+            onBookingStarted = {},
+            onTopicChanged = {},
+            onDateChanged = {},
+            onTimeChanged = {},
+            onNotesChanged = {},
+            onSubmit = {},
             onBack = {},
-            onReservationConfirmed = {},
             onViewCalendar = {}
         )
     }

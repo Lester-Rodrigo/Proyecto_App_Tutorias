@@ -19,19 +19,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.app_tutorias.R
 import com.example.app_tutorias.data.MockData
-import com.example.app_tutorias.data.SubjectCategory
 import com.example.app_tutorias.data.Tutor
-import com.example.app_tutorias.data.filterTutors
+import com.example.app_tutorias.ui.SearchUiState
 import com.example.app_tutorias.ui.components.EmptyState
 import com.example.app_tutorias.ui.components.TutorCard
 import com.example.app_tutorias.ui.theme.TutorLinkTextSecondary
@@ -39,15 +34,12 @@ import com.example.app_tutorias.ui.theme.TutorLinkTheme
 
 @Composable
 fun SearchScreen(
-    tutors: List<Tutor>,
-    categories: List<SubjectCategory>,
+    uiState: SearchUiState,
+    onQueryChanged: (String) -> Unit,
+    onClearQuery: () -> Unit,
+    onCategorySelected: (String?) -> Unit,
     onTutorClick: (Tutor) -> Unit
 ) {
-    var query by rememberSaveable { mutableStateOf("") }
-    var selectedCategoryId by rememberSaveable { mutableStateOf<String?>(null) }
-    val filteredTutors = filterTutors(tutors, query, selectedCategoryId)
-    val hasActiveFilter = query.isNotBlank() || selectedCategoryId != null
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -65,8 +57,8 @@ fun SearchScreen(
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp)
         )
         OutlinedTextField(
-            value = query,
-            onValueChange = { query = it },
+            value = uiState.query,
+            onValueChange = onQueryChanged,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 20.dp, vertical = 12.dp),
@@ -75,8 +67,8 @@ fun SearchScreen(
                 Icon(Icons.Outlined.Search, contentDescription = null)
             },
             trailingIcon = {
-                if (query.isNotEmpty()) {
-                    IconButton(onClick = { query = "" }) {
+                if (uiState.query.isNotEmpty()) {
+                    IconButton(onClick = onClearQuery) {
                         Icon(
                             Icons.Outlined.Clear,
                             contentDescription = stringResource(R.string.clear_search)
@@ -93,27 +85,21 @@ fun SearchScreen(
         ) {
             item {
                 FilterChip(
-                    selected = selectedCategoryId == null,
-                    onClick = { selectedCategoryId = null },
+                    selected = uiState.selectedCategoryId == null,
+                    onClick = { onCategorySelected(null) },
                     label = { Text(stringResource(R.string.all_subjects)) }
                 )
             }
-            items(categories, key = { it.id }) { category ->
+            items(uiState.categories, key = { it.id }) { category ->
                 FilterChip(
-                    selected = selectedCategoryId == category.id,
-                    onClick = {
-                        selectedCategoryId = if (selectedCategoryId == category.id) {
-                            null
-                        } else {
-                            category.id
-                        }
-                    },
+                    selected = uiState.selectedCategoryId == category.id,
+                    onClick = { onCategorySelected(category.id) },
                     label = { Text(category.name) }
                 )
             }
         }
 
-        if (filteredTutors.isEmpty()) {
+        if (uiState.filteredTutors.isEmpty()) {
             EmptyState(
                 title = stringResource(R.string.no_tutors_title),
                 description = stringResource(R.string.no_tutors_description),
@@ -126,15 +112,15 @@ fun SearchScreen(
             ) {
                 item {
                     Text(
-                        text = if (hasActiveFilter) {
-                            stringResource(R.string.results_count, filteredTutors.size)
+                        text = if (uiState.hasActiveFilter) {
+                            stringResource(R.string.results_count, uiState.filteredTutors.size)
                         } else {
                             stringResource(R.string.available_tutors)
                         },
                         style = MaterialTheme.typography.titleMedium
                     )
                 }
-                items(filteredTutors, key = { it.id }) { tutor ->
+                items(uiState.filteredTutors, key = { it.id }) { tutor ->
                     TutorCard(tutor = tutor, onClick = { onTutorClick(tutor) })
                 }
             }
@@ -147,8 +133,13 @@ fun SearchScreen(
 private fun SearchScreenPreview() {
     TutorLinkTheme {
         SearchScreen(
-            tutors = MockData.tutors,
-            categories = MockData.categories,
+            uiState = SearchUiState(
+                categories = MockData.categories,
+                filteredTutors = MockData.tutors
+            ),
+            onQueryChanged = {},
+            onClearQuery = {},
+            onCategorySelected = {},
             onTutorClick = {}
         )
     }
