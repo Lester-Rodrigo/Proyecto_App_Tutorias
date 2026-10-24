@@ -23,9 +23,15 @@ import com.example.app_tutorias.ui.screens.SearchScreen
 import com.example.app_tutorias.ui.screens.SettingsScreen
 import com.example.app_tutorias.ui.screens.TutorDetailScreen
 import com.example.app_tutorias.ui.theme.TutorLinkBackground
+import com.example.app_tutorias.di.AppContainer
+import com.example.app_tutorias.ui.login.AuthViewModel
+import com.example.app_tutorias.ui.login.AuthViewModelFactory
 
 @Composable
-fun TutorLinkNavHost() {
+fun TutorLinkNavHost(appContainer: AppContainer){
+    val authViewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory(appContainer.authRepository))
+    val authUiState by
+    authViewModel.uiState.collectAsStateWithLifecycle()
     val navController = rememberNavController()
     val viewModel: TutorLinkViewModel = viewModel()
     val homeUiState by viewModel.homeUiState.collectAsStateWithLifecycle()
@@ -85,8 +91,16 @@ fun TutorLinkNavHost() {
         ) {
             composable(Destination.Login.route) {
                 LoginScreen(
+                    uiState = authUiState,
+                    onNameChanged = authViewModel::onNameChanged,
+                    onEmailChanged = authViewModel::onEmailChanged,
+                    onPasswordChanged = authViewModel::onPasswordChanged,
+                    onSubmit = authViewModel::submit,
+                    onToggleMode = authViewModel::toggleMode,
                     onLoginSuccess = {
-                        navController.navigate(Destination.Home.route) {
+                        navController.navigate(
+                            Destination.Home.route
+                        ) {
                             popUpTo(Destination.Login.route) {
                                 inclusive = true
                             }
@@ -175,6 +189,7 @@ fun TutorLinkNavHost() {
             composable(Destination.Settings.route) {
                 SettingsScreen(
                     onLogout = {
+                        authViewModel.signOut()
                         navController.navigate(Destination.Login.route) {
                             popUpTo(navController.graph.id) {
                                 inclusive = true

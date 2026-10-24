@@ -11,9 +11,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        val appContainer = (application as TutoriasApplication).container
         setContent {
             TutorLinkTheme {
-                TutorLinkNavHost()
+                TutorLinkNavHost(appContainer = appContainer)
             }
         }
     }
