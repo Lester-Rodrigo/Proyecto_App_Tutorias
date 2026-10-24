@@ -35,9 +35,6 @@ import com.example.app_tutorias.data.TutoringSession
 import com.example.app_tutorias.ui.components.EmptyState
 import com.example.app_tutorias.ui.components.SessionCard
 import com.example.app_tutorias.ui.components.TutorCard
-import com.example.app_tutorias.ui.theme.TutorFavoriteBackground
-import com.example.app_tutorias.ui.theme.TutorLinkGreenActive
-import com.example.app_tutorias.ui.theme.TutorLinkTextSecondary
 import com.example.app_tutorias.ui.theme.TutorLinkTheme
 
 @Composable
@@ -62,7 +59,7 @@ fun HomeScreen(
                 Text(
                     text = stringResource(R.string.home_subtitle),
                     style = MaterialTheme.typography.bodyLarge,
-                    color = TutorLinkTextSecondary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
@@ -83,18 +80,18 @@ fun HomeScreen(
                     Icon(
                         imageVector = Icons.Outlined.Search,
                         contentDescription = null,
-                        tint = TutorLinkGreenActive
+                        tint = MaterialTheme.colorScheme.primary
                     )
                     Text(
                         text = stringResource(R.string.search_hint),
                         style = MaterialTheme.typography.bodyLarge,
-                        color = TutorLinkTextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.weight(1f)
                     )
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.ArrowForward,
                         contentDescription = null,
-                        tint = TutorLinkGreenActive
+                        tint = MaterialTheme.colorScheme.primary
                     )
                 }
             }
@@ -106,12 +103,12 @@ fun HomeScreen(
                     Surface(
                         modifier = Modifier.clickable(onClick = onSearchClick),
                         shape = CircleShape,
-                        color = TutorFavoriteBackground
+                        color = MaterialTheme.colorScheme.primaryContainer
                     ) {
                         Text(
                             text = "${category.emoji}  ${category.name}",
                             style = MaterialTheme.typography.labelLarge,
-                            color = TutorLinkGreenActive,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
                             modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
                         )
                     }
@@ -132,7 +129,7 @@ fun HomeScreen(
                 Text(
                     text = stringResource(R.string.view_calendar),
                     style = MaterialTheme.typography.labelLarge,
-                    color = TutorLinkGreenActive,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.clickable(onClick = onCalendarClick)
                 )
             }

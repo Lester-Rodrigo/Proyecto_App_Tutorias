@@ -31,9 +31,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.app_tutorias.navigation.Destination
 import com.example.app_tutorias.ui.theme.InterFont
-import com.example.app_tutorias.ui.theme.TutorLinkGreen
-import com.example.app_tutorias.ui.theme.TutorLinkGreenActive
-import com.example.app_tutorias.ui.theme.TutorLinkTextSecondary
+import androidx.compose.material3.MaterialTheme
 
 private data class BottomBarItem(
     val destination: Destination,
@@ -66,7 +64,7 @@ fun TutorLinkBottomBar(
 ) {
     Surface(
         modifier = Modifier.fillMaxWidth(),
-        color = Color.White,
+        color = MaterialTheme.colorScheme.surface,
         shape = RoundedCornerShape(
             topStart = 12.dp,
             topEnd = 12.dp
@@ -95,7 +93,7 @@ fun TutorLinkBottomBar(
                             .clip(CircleShape)
                             .background(
                                 if (selected) {
-                                    TutorLinkGreen
+                                    MaterialTheme.colorScheme.primaryContainer
                                 } else {
                                     Color.Transparent
                                 }
@@ -118,18 +116,18 @@ fun TutorLinkBottomBar(
                                 item.destination.label,
                             modifier = Modifier.size(20.dp),
                             tint = if (selected) {
-                                TutorLinkGreenActive
+                                MaterialTheme.colorScheme.onPrimaryContainer
                             } else {
-                                TutorLinkTextSecondary
+                                MaterialTheme.colorScheme.onSurfaceVariant
                             }
                         )
 
                         Text(
                             text = item.destination.label,
                             color = if (selected) {
-                                TutorLinkGreenActive
+                                MaterialTheme.colorScheme.onPrimaryContainer
                             } else {
-                                TutorLinkTextSecondary
+                                MaterialTheme.colorScheme.onSurfaceVariant
                             },
                             fontFamily = InterFont,
                             maxLines = 1,

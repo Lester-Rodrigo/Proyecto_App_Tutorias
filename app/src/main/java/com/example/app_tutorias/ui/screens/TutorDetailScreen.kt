@@ -47,9 +47,6 @@ import com.example.app_tutorias.data.MockData
 import com.example.app_tutorias.data.Tutor
 import com.example.app_tutorias.ui.BookingUiState
 import com.example.app_tutorias.ui.components.TutorAvatar
-import com.example.app_tutorias.ui.theme.TutorFavoriteBackground
-import com.example.app_tutorias.ui.theme.TutorLinkGreenActive
-import com.example.app_tutorias.ui.theme.TutorLinkTextSecondary
 import com.example.app_tutorias.ui.theme.TutorLinkTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -80,6 +77,7 @@ fun TutorDetailScreen(
     }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.tutor_detail_title)) },
@@ -107,7 +105,7 @@ fun TutorDetailScreen(
                 Text(
                     text = tutor.description,
                     style = MaterialTheme.typography.bodyLarge,
-                    color = TutorLinkTextSecondary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             item {
@@ -122,13 +120,13 @@ fun TutorDetailScreen(
                         listOf(tutor.availability, "Viernes · 11:00 a. m.", "Sábado · 9:00 a. m.")
                     ) { availability ->
                         Surface(
-                            color = TutorFavoriteBackground,
+                            color = MaterialTheme.colorScheme.primaryContainer,
                             shape = MaterialTheme.shapes.small
                         ) {
                             Text(
                                 text = availability,
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = TutorLinkGreenActive,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
                             )
                         }
@@ -263,7 +261,7 @@ private fun TutorHeader(tutor: Tutor) {
             Text(
                 text = tutor.specialty,
                 style = MaterialTheme.typography.bodyLarge,
-                color = TutorLinkTextSecondary
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             Row(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -273,13 +271,13 @@ private fun TutorHeader(tutor: Tutor) {
                     Icon(
                         imageVector = Icons.Outlined.Star,
                         contentDescription = null,
-                        tint = TutorLinkGreenActive,
+                        tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(18.dp)
                     )
                     Text(
                         text = tutor.rating.toString(),
                         style = MaterialTheme.typography.labelLarge,
-                        color = TutorLinkGreenActive
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
                 Text(

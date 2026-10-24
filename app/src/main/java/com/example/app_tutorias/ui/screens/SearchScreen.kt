@@ -29,7 +29,6 @@ import com.example.app_tutorias.data.Tutor
 import com.example.app_tutorias.ui.SearchUiState
 import com.example.app_tutorias.ui.components.EmptyState
 import com.example.app_tutorias.ui.components.TutorCard
-import com.example.app_tutorias.ui.theme.TutorLinkTextSecondary
 import com.example.app_tutorias.ui.theme.TutorLinkTheme
 
 @Composable
@@ -53,7 +52,7 @@ fun SearchScreen(
         Text(
             text = stringResource(R.string.search_subtitle),
             style = MaterialTheme.typography.bodyMedium,
-            color = TutorLinkTextSecondary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp)
         )
         OutlinedTextField(

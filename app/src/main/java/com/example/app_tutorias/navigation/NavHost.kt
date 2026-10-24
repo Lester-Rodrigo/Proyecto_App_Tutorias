@@ -22,13 +22,14 @@ import com.example.app_tutorias.ui.screens.LoginScreen
 import com.example.app_tutorias.ui.screens.SearchScreen
 import com.example.app_tutorias.ui.screens.SettingsScreen
 import com.example.app_tutorias.ui.screens.TutorDetailScreen
-import com.example.app_tutorias.ui.theme.TutorLinkBackground
 import com.example.app_tutorias.di.AppContainer
 import com.example.app_tutorias.ui.login.AuthViewModel
 import com.example.app_tutorias.ui.login.AuthViewModelFactory
+import androidx.navigation.navDeepLink
+import androidx.compose.material3.MaterialTheme
 
 @Composable
-fun TutorLinkNavHost(appContainer: AppContainer){
+fun TutorLinkNavHost(appContainer: AppContainer, darkModeEnabled: Boolean, onDarkModeChanged: (Boolean) -> Unit){
     val authViewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory(appContainer.authRepository))
     val authUiState by
     authViewModel.uiState.collectAsStateWithLifecycle()
@@ -51,7 +52,7 @@ fun TutorLinkNavHost(appContainer: AppContainer){
     val showAppBars = currentRoute in appBarRoutes
 
     Scaffold(
-        containerColor = TutorLinkBackground,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             if (showAppBars) {
                 TutorLinkTopBar(
@@ -154,8 +155,8 @@ fun TutorLinkNavHost(appContainer: AppContainer){
             }
             composable(
                 route = Destination.TutorDetail.route,
-                arguments = listOf(
-                    navArgument("tutorId") { type = NavType.StringType }
+                arguments = listOf(navArgument("tutorId") { type = NavType.StringType }),
+                deepLinks = listOf(navDeepLink { uriPattern = "tutorlink://tutor/{tutorId}" }
                 )
             ) { entry ->
                 val tutorId = entry.arguments?.getString("tutorId")
@@ -188,6 +189,8 @@ fun TutorLinkNavHost(appContainer: AppContainer){
             }
             composable(Destination.Settings.route) {
                 SettingsScreen(
+                    darkModeEnabled = darkModeEnabled,
+                    onDarkModeChanged = onDarkModeChanged,
                     onLogout = {
                         authViewModel.signOut()
                         navController.navigate(Destination.Login.route) {
