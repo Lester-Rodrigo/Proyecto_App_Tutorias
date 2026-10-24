@@ -27,6 +27,7 @@ import com.example.app_tutorias.ui.login.AuthViewModel
 import com.example.app_tutorias.ui.login.AuthViewModelFactory
 import androidx.navigation.navDeepLink
 import androidx.compose.material3.MaterialTheme
+import com.example.app_tutorias.ui.TutorLinkViewModelFactory
 
 @Composable
 fun TutorLinkNavHost(appContainer: AppContainer, darkModeEnabled: Boolean, onDarkModeChanged: (Boolean) -> Unit){
@@ -34,7 +35,14 @@ fun TutorLinkNavHost(appContainer: AppContainer, darkModeEnabled: Boolean, onDar
     val authUiState by
     authViewModel.uiState.collectAsStateWithLifecycle()
     val navController = rememberNavController()
-    val viewModel: TutorLinkViewModel = viewModel()
+    val viewModel: TutorLinkViewModel = viewModel(
+        factory = TutorLinkViewModelFactory(
+            catalogRepository = appContainer.catalogRepository,
+            sessionRepository = appContainer.sessionRepository,
+            favoritesRepository = appContainer.favoritesRepository,
+            searchHistoryRepository = appContainer.searchHistoryRepository
+        )
+    )
     val homeUiState by viewModel.homeUiState.collectAsStateWithLifecycle()
     val searchUiState by viewModel.searchUiState.collectAsStateWithLifecycle()
     val calendarUiState by viewModel.calendarUiState.collectAsStateWithLifecycle()

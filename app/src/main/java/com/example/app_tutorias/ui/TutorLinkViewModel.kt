@@ -17,8 +17,17 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import com.example.app_tutorias.domain.repository.CatalogRepository
+import com.example.app_tutorias.domain.repository.FavoritesRepository
+import com.example.app_tutorias.domain.repository.SearchHistoryRepository
+import com.example.app_tutorias.domain.repository.SessionRepository
 
-class TutorLinkViewModel : ViewModel() {
+class TutorLinkViewModel(
+    private val catalogRepository: CatalogRepository,
+    private val sessionRepository: SessionRepository,
+    private val favoritesRepository: FavoritesRepository,
+    private val searchHistoryRepository: SearchHistoryRepository
+) : ViewModel() {
     val categories = MockData.categories
     val tutors = MockData.tutors
 
