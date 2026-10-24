@@ -7,6 +7,6 @@ class TutoriasApplication : Application() {
     lateinit var container: AppContainer private set
     override fun onCreate() {
         super.onCreate()
-        container = AppContainer()
+        container = AppContainer(applicationContext)
     }
 }
