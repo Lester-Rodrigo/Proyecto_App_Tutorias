@@ -5,6 +5,8 @@ import com.example.app_tutorias.data.mapper.toDto
 import com.example.app_tutorias.data.remote.firestore.SessionRemoteDataSource
 import com.example.app_tutorias.domain.model.TutoringSession
 import com.example.app_tutorias.domain.model.TutoringStatus
+import com.example.app_tutorias.domain.model.SessionWriteResult
+import kotlinx.coroutines.CancellationException
 import com.example.app_tutorias.domain.repository.SessionRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -22,7 +24,13 @@ class SessionRepositoryImpl(
 
     override suspend fun createSession(
         session: TutoringSession
-    ): Result<String> = runCatching { remoteDataSource.createSession(session.toDto()) }
+    ): Result<SessionWriteResult> = try {
+        Result.success(remoteDataSource.createSession(session.toDto()))
+    } catch (exception: CancellationException) {
+        throw exception
+    } catch (exception: Exception) {
+        Result.failure(exception)
+    }
 
     override suspend fun updateSessionStatus(
         sessionId: String,

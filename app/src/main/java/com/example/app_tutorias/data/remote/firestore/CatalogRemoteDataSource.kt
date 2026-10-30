@@ -17,14 +17,12 @@ class CatalogRemoteDataSource(
                         close(error)
                         return@addSnapshotListener
                     }
-                    val tutors = snapshot
-                        ?.documents
-                        ?.mapNotNull { document ->
-                            document.toObject(TutorDto::class.java)
-                                ?.copy(id = document.id)
-                        }
-                        .orEmpty()
-                    trySend(tutors)
+                    val tutors = runCatching {
+                        snapshot?.documents?.mapNotNull { document ->
+                            document.toObject(TutorDto::class.java)?.copy(id = document.id)
+                        }.orEmpty()
+                    }
+                    tutors.onSuccess { trySend(it) }.onFailure { close(it) }
                 }
             awaitClose { registration.remove() }
         }
@@ -39,11 +37,11 @@ class CatalogRemoteDataSource(
                         close(error)
                         return@addSnapshotListener
                     }
-                    val tutor = snapshot
-                        ?.toObject(TutorDto::class.java)
-                        ?.copy(id = tutorId)
+                    val tutor = runCatching {
+                        snapshot?.toObject(TutorDto::class.java)?.copy(id = tutorId)
+                    }
 
-                    trySend(tutor)
+                    tutor.onSuccess { trySend(it) }.onFailure { close(it) }
                 }
             awaitClose { registration.remove() }
         }
@@ -57,14 +55,12 @@ class CatalogRemoteDataSource(
                         close(error)
                         return@addSnapshotListener
                     }
-                    val subjects = snapshot
-                        ?.documents
-                        ?.mapNotNull { document ->
-                            document.toObject(SubjectDto::class.java)
-                                ?.copy(id = document.id)
-                        }
-                        .orEmpty()
-                    trySend(subjects)
+                    val subjects = runCatching {
+                        snapshot?.documents?.mapNotNull { document ->
+                            document.toObject(SubjectDto::class.java)?.copy(id = document.id)
+                        }.orEmpty()
+                    }
+                    subjects.onSuccess { trySend(it) }.onFailure { close(it) }
                 }
             awaitClose { registration.remove() }
         }

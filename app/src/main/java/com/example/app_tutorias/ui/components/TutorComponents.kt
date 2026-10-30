@@ -162,7 +162,11 @@ fun SessionCard(
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.weight(1f)
                     )
-                    SessionStatusBadge(status = session.status)
+                    if (session.isPendingSync) {
+                        Text("Pendiente de sincronizar", style = MaterialTheme.typography.labelSmall)
+                    } else {
+                        SessionStatusBadge(status = session.status)
+                    }
                 }
                 Text(
                     text = session.tutorName,

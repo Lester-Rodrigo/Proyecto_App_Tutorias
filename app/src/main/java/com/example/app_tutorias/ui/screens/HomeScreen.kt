@@ -36,6 +36,8 @@ import com.example.app_tutorias.ui.components.EmptyState
 import com.example.app_tutorias.ui.components.SessionCard
 import com.example.app_tutorias.ui.components.TutorCard
 import com.example.app_tutorias.ui.theme.TutorLinkTheme
+import com.example.app_tutorias.ui.UiLoadState
+import com.example.app_tutorias.ui.components.DataStatus
 
 @Composable
 fun HomeScreen(
@@ -44,12 +46,22 @@ fun HomeScreen(
     nextSession: TutoringSession?,
     onSearchClick: () -> Unit,
     onTutorClick: (Tutor) -> Unit,
-    onCalendarClick: () -> Unit
+    onCalendarClick: () -> Unit,
+    loadState: UiLoadState = UiLoadState.CONTENT,
+    errorMessage: String? = null,
+    onRetry: () -> Unit = {}
 ) {
+    if (loadState != UiLoadState.CONTENT) {
+        DataStatus(loadState, errorMessage, onRetry)
+        return
+    }
     LazyColumn(
         contentPadding = PaddingValues(horizontal = 20.dp, vertical = 20.dp),
         verticalArrangement = Arrangement.spacedBy(20.dp)
     ) {
+        if (errorMessage != null) {
+            item { DataStatus(UiLoadState.ERROR, errorMessage, onRetry) }
+        }
         item {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(

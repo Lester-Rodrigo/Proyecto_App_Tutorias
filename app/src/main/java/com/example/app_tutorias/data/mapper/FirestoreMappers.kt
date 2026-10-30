@@ -106,7 +106,8 @@ fun SessionDto.toDomain(): TutoringSession =
         status = runCatching {
             TutoringStatus.valueOf(status)
         }.getOrDefault(TutoringStatus.UPCOMING),
-        createdAt = createdAt.toDate().toInstant()
+        createdAt = createdAt.toDate().toInstant(),
+        isPendingSync = isPendingSync
     )
 
 fun TutoringSession.toDto(): SessionDto =

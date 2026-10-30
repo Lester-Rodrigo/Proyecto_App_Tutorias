@@ -1,7 +1,8 @@
 # TutorLink · Proyecto App Tutorías
 
 App Android para buscar tutores y reservar tutorías, hecha con **Jetpack Compose**, **Material Design 3**
-y **Navigation Compose**. Por ahora usa datos mock, sin backend.
+y **Navigation Compose**. El flujo principal usa Firebase Authentication y Firestore mediante repositorios.
+Consulta la [configuración y verificación de Firestore](docs/firestore.md).
 
 ## Entrega 3 · Prototipo navegable
 

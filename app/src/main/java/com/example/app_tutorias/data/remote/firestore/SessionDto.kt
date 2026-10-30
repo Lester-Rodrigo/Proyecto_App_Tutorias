@@ -14,5 +14,7 @@ data class SessionDto(
     val endAt: Timestamp = Timestamp(0, 0),
     val notes: String = "",
     val status: String = "UPCOMING",
-    val createdAt: Timestamp = Timestamp(0, 0)
+    val createdAt: Timestamp = Timestamp(0, 0),
+    @get:com.google.firebase.firestore.Exclude
+    val isPendingSync: Boolean = false
 )

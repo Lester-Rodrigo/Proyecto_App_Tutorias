@@ -64,7 +64,11 @@ fun TutorDetailScreen(
     onViewCalendar: () -> Unit
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
-    val confirmationMessage = stringResource(R.string.booking_success)
+    val confirmationMessage = if (uiState.isPendingSync) {
+        "Reserva pendiente de sincronización. Se enviará al recuperar la conexión; aún no está confirmada."
+    } else {
+        stringResource(R.string.booking_success)
+    }
 
     LaunchedEffect(tutor.id) {
         onBookingStarted()
@@ -163,7 +167,7 @@ fun TutorDetailScreen(
                     } else {
                         null
                     },
-                    keyboardType = KeyboardType.Number
+                    keyboardType = KeyboardType.Text
                 )
             }
             item {
@@ -177,7 +181,7 @@ fun TutorDetailScreen(
                     } else {
                         null
                     },
-                    keyboardType = KeyboardType.Number
+                    keyboardType = KeyboardType.Text
                 )
             }
             item {
@@ -210,6 +214,12 @@ fun TutorDetailScreen(
                 )
             }
             item {
+                uiState.errorMessage?.let { message ->
+                    Text(message, color = MaterialTheme.colorScheme.error)
+                }
+                if (uiState.isPendingSync) {
+                    Text("Pendiente de sincronización. Consulta el calendario para ver cuándo se confirma.")
+                }
                 Button(
                     onClick = onSubmit,
                     enabled = uiState.canSubmit,
@@ -225,7 +235,9 @@ fun TutorDetailScreen(
                         )
                     } else {
                         Text(
-                            text = if (uiState.reservationComplete) {
+                            text = if (uiState.isPendingSync) {
+                                "Pendiente de sincronizar"
+                            } else if (uiState.reservationComplete) {
                                 stringResource(R.string.booking_confirmed)
                             } else {
                                 stringResource(R.string.book_tutoring)

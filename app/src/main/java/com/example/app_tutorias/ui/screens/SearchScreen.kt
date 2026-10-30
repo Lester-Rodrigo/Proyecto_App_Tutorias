@@ -30,6 +30,8 @@ import com.example.app_tutorias.ui.SearchUiState
 import com.example.app_tutorias.ui.components.EmptyState
 import com.example.app_tutorias.ui.components.TutorCard
 import com.example.app_tutorias.ui.theme.TutorLinkTheme
+import com.example.app_tutorias.ui.UiLoadState
+import com.example.app_tutorias.ui.components.DataStatus
 
 @Composable
 fun SearchScreen(
@@ -37,8 +39,13 @@ fun SearchScreen(
     onQueryChanged: (String) -> Unit,
     onClearQuery: () -> Unit,
     onCategorySelected: (String?) -> Unit,
-    onTutorClick: (Tutor) -> Unit
+    onTutorClick: (Tutor) -> Unit,
+    onRetry: () -> Unit = {}
 ) {
+    if (uiState.loadState == UiLoadState.LOADING || uiState.loadState == UiLoadState.ERROR) {
+        DataStatus(uiState.loadState, uiState.errorMessage, onRetry)
+        return
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()

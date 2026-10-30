@@ -56,7 +56,9 @@ data class BookingUiState(
     val timeTouched: Boolean = false,
     val notesTouched: Boolean = false,
     val isSubmitting: Boolean = false,
-    val reservationComplete: Boolean = false
+    val reservationComplete: Boolean = false,
+    val isPendingSync: Boolean = false,
+    val errorMessage: String? = null
 ) {
     val canSubmit: Boolean
         get() = validation.isValid && !isSubmitting && !reservationComplete

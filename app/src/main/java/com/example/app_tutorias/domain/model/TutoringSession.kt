@@ -20,5 +20,6 @@ data class TutoringSession(
     val endAt: Instant,
     val notes: String,
     val status: TutoringStatus,
-    val createdAt: Instant
+    val createdAt: Instant,
+    val isPendingSync: Boolean = false
 )

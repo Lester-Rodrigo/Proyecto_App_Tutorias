@@ -2,6 +2,7 @@ package com.example.app_tutorias.domain.repository
 
 import com.example.app_tutorias.domain.model.TutoringSession
 import com.example.app_tutorias.domain.model.TutoringStatus
+import com.example.app_tutorias.domain.model.SessionWriteResult
 import kotlinx.coroutines.flow.Flow
 
 interface SessionRepository {
@@ -9,7 +10,7 @@ interface SessionRepository {
 
     suspend fun createSession(
         session: TutoringSession
-    ): Result<String>
+    ): Result<SessionWriteResult>
 
     suspend fun updateSessionStatus(
         sessionId: String,

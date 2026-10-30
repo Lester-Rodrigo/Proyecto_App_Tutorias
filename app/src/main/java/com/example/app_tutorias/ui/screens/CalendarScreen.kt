@@ -24,12 +24,19 @@ import com.example.app_tutorias.ui.SessionFilter
 import com.example.app_tutorias.ui.components.EmptyState
 import com.example.app_tutorias.ui.components.SessionCard
 import com.example.app_tutorias.ui.theme.TutorLinkTheme
+import com.example.app_tutorias.ui.UiLoadState
+import com.example.app_tutorias.ui.components.DataStatus
 
 @Composable
 fun CalendarScreen(
     uiState: CalendarUiState,
-    onFilterSelected: (SessionFilter) -> Unit
+    onFilterSelected: (SessionFilter) -> Unit,
+    onRetry: () -> Unit = {}
 ) {
+    if (uiState.loadState == UiLoadState.LOADING || uiState.loadState == UiLoadState.ERROR) {
+        DataStatus(uiState.loadState, uiState.errorMessage, onRetry)
+        return
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()

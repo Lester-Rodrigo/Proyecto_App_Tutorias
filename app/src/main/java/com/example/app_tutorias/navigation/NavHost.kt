@@ -28,6 +28,11 @@ import com.example.app_tutorias.ui.login.AuthViewModelFactory
 import androidx.navigation.navDeepLink
 import androidx.compose.material3.MaterialTheme
 import com.example.app_tutorias.ui.TutorLinkViewModelFactory
+import com.example.app_tutorias.ui.components.DataStatus
+import com.example.app_tutorias.ui.UiLoadState
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.Column
 
 @Composable
 fun TutorLinkNavHost(appContainer: AppContainer, darkModeEnabled: Boolean, onDarkModeChanged: (Boolean) -> Unit){
@@ -40,7 +45,8 @@ fun TutorLinkNavHost(appContainer: AppContainer, darkModeEnabled: Boolean, onDar
             catalogRepository = appContainer.catalogRepository,
             sessionRepository = appContainer.sessionRepository,
             favoritesRepository = appContainer.favoritesRepository,
-            searchHistoryRepository = appContainer.searchHistoryRepository
+            searchHistoryRepository = appContainer.searchHistoryRepository,
+            authRepository = appContainer.authRepository
         )
     )
     val homeUiState by viewModel.homeUiState.collectAsStateWithLifecycle()
@@ -123,6 +129,9 @@ fun TutorLinkNavHost(appContainer: AppContainer, darkModeEnabled: Boolean, onDar
                     categories = homeUiState.categories,
                     recommendedTutors = homeUiState.recommendedTutors,
                     nextSession = homeUiState.nextSession,
+                    loadState = homeUiState.loadState,
+                    errorMessage = homeUiState.errorMessage,
+                    onRetry = viewModel::retryLoading,
                     onSearchClick = {
                         navController.navigate(Destination.Search.route) {
                             launchSingleTop = true
@@ -146,6 +155,7 @@ fun TutorLinkNavHost(appContainer: AppContainer, darkModeEnabled: Boolean, onDar
                     onQueryChanged = viewModel::onSearchQueryChanged,
                     onClearQuery = viewModel::clearSearchQuery,
                     onCategorySelected = viewModel::onSearchCategorySelected,
+                    onRetry = viewModel::retryLoading,
                     onTutorClick = { tutor ->
                         navController.navigate(
                             Destination.TutorDetail.createRoute(tutor.id)
@@ -158,7 +168,8 @@ fun TutorLinkNavHost(appContainer: AppContainer, darkModeEnabled: Boolean, onDar
             composable(Destination.Calendar.route) {
                 CalendarScreen(
                     uiState = calendarUiState,
-                    onFilterSelected = viewModel::onSessionFilterSelected
+                    onFilterSelected = viewModel::onSessionFilterSelected,
+                    onRetry = viewModel::retryLoading
                 )
             }
             composable(
@@ -193,6 +204,15 @@ fun TutorLinkNavHost(appContainer: AppContainer, darkModeEnabled: Boolean, onDar
                             }
                         }
                     )
+                } else {
+                    Column {
+                        DataStatus(
+                            loadState = if (homeUiState.loadState == UiLoadState.LOADING) UiLoadState.LOADING else UiLoadState.ERROR,
+                            errorMessage = if (homeUiState.loadState == UiLoadState.LOADING) null else "No se encontró el tutor. Revisa la conexión o vuelve a buscar.",
+                            onRetry = viewModel::retryLoading
+                        )
+                        TextButton(onClick = { navController.popBackStack() }) { Text("Volver") }
+                    }
                 }
             }
             composable(Destination.Settings.route) {
