@@ -29,12 +29,6 @@ import androidx.compose.ui.unit.dp
 import com.example.app_tutorias.data.Tutor
 import com.example.app_tutorias.data.TutoringSession
 import com.example.app_tutorias.data.TutoringStatus
-import com.example.app_tutorias.ui.theme.TutorAvatarBackground
-import com.example.app_tutorias.ui.theme.TutorFavoriteBackground
-import com.example.app_tutorias.ui.theme.TutorLinkGreenActive
-import com.example.app_tutorias.ui.theme.TutorLinkGreenText
-import com.example.app_tutorias.ui.theme.TutorLinkInputBackground
-import com.example.app_tutorias.ui.theme.TutorLinkTextSecondary
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
@@ -46,13 +40,13 @@ fun TutorAvatar(
     Box(
         modifier = modifier
             .clip(CircleShape)
-            .background(TutorAvatarBackground),
+            .background(MaterialTheme.colorScheme.primaryContainer),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = initials,
             style = MaterialTheme.typography.titleMedium,
-            color = TutorLinkGreenText
+            color = MaterialTheme.colorScheme.onPrimaryContainer
         )
     }
 }
@@ -88,7 +82,7 @@ fun TutorCard(
                 Text(
                     text = tutor.specialty,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = TutorLinkTextSecondary
+                    color = MaterialTheme.colorScheme.primary
                 )
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(10.dp),
@@ -98,13 +92,13 @@ fun TutorCard(
                         Icon(
                             imageVector = Icons.Outlined.Star,
                             contentDescription = null,
-                            tint = TutorLinkGreenActive,
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(17.dp)
                         )
                         Text(
                             text = tutor.rating.toString(),
                             style = MaterialTheme.typography.labelMedium,
-                            color = TutorLinkGreenActive
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
                     Text(
@@ -116,7 +110,7 @@ fun TutorCard(
                 Text(
                     text = tutor.availability,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = TutorLinkGreenText
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }
@@ -145,13 +139,13 @@ fun SessionCard(
                 modifier = Modifier
                     .size(44.dp)
                     .clip(CircleShape)
-                    .background(TutorFavoriteBackground),
+                    .background(MaterialTheme.colorScheme.primaryContainer),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Outlined.Event,
                     contentDescription = null,
-                    tint = TutorLinkGreenActive
+                    tint = MaterialTheme.colorScheme.primary
                 )
             }
             Column(
@@ -168,17 +162,21 @@ fun SessionCard(
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.weight(1f)
                     )
-                    SessionStatusBadge(status = session.status)
+                    if (session.isPendingSync) {
+                        Text("Pendiente de sincronizar", style = MaterialTheme.typography.labelSmall)
+                    } else {
+                        SessionStatusBadge(status = session.status)
+                    }
                 }
                 Text(
                     text = session.tutorName,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = TutorLinkTextSecondary
+                    color = MaterialTheme.colorScheme.primary
                 )
                 Text(
                     text = "${session.date.format(dateFormatter)} · ${session.time.format(timeFormatter)}",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = TutorLinkGreenText
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }
@@ -186,29 +184,42 @@ fun SessionCard(
 }
 
 @Composable
-private fun SessionStatusBadge(status: TutoringStatus) {
+private fun SessionStatusBadge(
+    status: TutoringStatus
+) {
     val label = when (status) {
         TutoringStatus.UPCOMING -> "Próxima"
         TutoringStatus.COMPLETED -> "Completada"
         TutoringStatus.CANCELLED -> "Cancelada"
     }
     val background = when (status) {
-        TutoringStatus.UPCOMING -> TutorFavoriteBackground
-        TutoringStatus.COMPLETED -> TutorLinkInputBackground
-        TutoringStatus.CANCELLED -> MaterialTheme.colorScheme.errorContainer
+        TutoringStatus.UPCOMING ->
+            MaterialTheme.colorScheme.primaryContainer
+        TutoringStatus.COMPLETED ->
+            MaterialTheme.colorScheme.surfaceVariant
+        TutoringStatus.CANCELLED ->
+            MaterialTheme.colorScheme.errorContainer
     }
     val contentColor = when (status) {
-        TutoringStatus.UPCOMING -> TutorLinkGreenActive
-        TutoringStatus.COMPLETED -> TutorLinkTextSecondary
-        TutoringStatus.CANCELLED -> MaterialTheme.colorScheme.error
+        TutoringStatus.UPCOMING ->
+            MaterialTheme.colorScheme.onPrimaryContainer
+        TutoringStatus.COMPLETED ->
+            MaterialTheme.colorScheme.onSurfaceVariant
+        TutoringStatus.CANCELLED ->
+            MaterialTheme.colorScheme.onErrorContainer
     }
-
-    Surface(color = background, shape = CircleShape) {
+    Surface(
+        color = background,
+        shape = CircleShape
+    ) {
         Text(
             text = label,
             style = MaterialTheme.typography.labelMedium,
             color = contentColor,
-            modifier = Modifier.padding(horizontal = 9.dp, vertical = 4.dp)
+            modifier = Modifier.padding(
+                horizontal = 9.dp,
+                vertical = 4.dp
+            )
         )
     }
 }
@@ -229,7 +240,7 @@ fun EmptyState(
         Icon(
             imageVector = Icons.Outlined.School,
             contentDescription = null,
-            tint = TutorLinkGreenActive,
+            tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier.size(48.dp)
         )
         Text(
@@ -239,7 +250,7 @@ fun EmptyState(
         Text(
             text = description,
             style = MaterialTheme.typography.bodyMedium,
-            color = TutorLinkTextSecondary
+            color = MaterialTheme.colorScheme.primary
         )
         Spacer(modifier = Modifier.size(4.dp))
     }

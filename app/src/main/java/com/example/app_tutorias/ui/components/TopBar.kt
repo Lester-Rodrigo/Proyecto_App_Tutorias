@@ -21,11 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import com.example.app_tutorias.ui.theme.TutorAvatarBackground
-import com.example.app_tutorias.ui.theme.TutorLinkBackground
-import com.example.app_tutorias.ui.theme.TutorLinkGreenActive
-import com.example.app_tutorias.ui.theme.TutorLinkGreenText
-import com.example.app_tutorias.ui.theme.TutorLinkInputBackground
+
 
 @Composable
 fun TutorLinkTopBar(
@@ -35,7 +31,7 @@ fun TutorLinkTopBar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .background(TutorLinkBackground)
+            .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
             .height(72.dp)
             .padding(horizontal = 20.dp),
@@ -51,19 +47,19 @@ fun TutorLinkTopBar(
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
-                    .background(TutorAvatarBackground)
+                    .background(MaterialTheme.colorScheme.primaryContainer)
             ) {
                 Icon(
                     imageVector = Icons.Outlined.Person,
                     contentDescription = "Perfil",
-                    tint = TutorLinkGreenText,
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(22.dp)
                 )
             }
             Text(
                 text = "TutorLink",
                 style = MaterialTheme.typography.titleLarge,
-                color = TutorLinkGreenText
+                color = MaterialTheme.colorScheme.primary
             )
         }
 
@@ -72,12 +68,12 @@ fun TutorLinkTopBar(
             modifier = Modifier
                 .size(40.dp)
                 .clip(CircleShape)
-                .background(TutorLinkInputBackground)
+                .background(MaterialTheme.colorScheme.surfaceVariant)
         ) {
             Icon(
                 imageVector = Icons.Outlined.Notifications,
                 contentDescription = "Notificaciones",
-                tint = TutorLinkGreenActive,
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(20.dp)
             )
         }

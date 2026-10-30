@@ -13,7 +13,6 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.app_tutorias.data.TutoringStatus
 import com.example.app_tutorias.ui.TutorLinkViewModel
 import com.example.app_tutorias.ui.components.TutorLinkBottomBar
 import com.example.app_tutorias.ui.components.TutorLinkTopBar
@@ -23,13 +22,37 @@ import com.example.app_tutorias.ui.screens.LoginScreen
 import com.example.app_tutorias.ui.screens.SearchScreen
 import com.example.app_tutorias.ui.screens.SettingsScreen
 import com.example.app_tutorias.ui.screens.TutorDetailScreen
-import com.example.app_tutorias.ui.theme.TutorLinkBackground
+import com.example.app_tutorias.di.AppContainer
+import com.example.app_tutorias.ui.login.AuthViewModel
+import com.example.app_tutorias.ui.login.AuthViewModelFactory
+import androidx.navigation.navDeepLink
+import androidx.compose.material3.MaterialTheme
+import com.example.app_tutorias.ui.TutorLinkViewModelFactory
+import com.example.app_tutorias.ui.components.DataStatus
+import com.example.app_tutorias.ui.UiLoadState
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.Column
 
 @Composable
-fun TutorLinkNavHost() {
+fun TutorLinkNavHost(appContainer: AppContainer, darkModeEnabled: Boolean, onDarkModeChanged: (Boolean) -> Unit){
+    val authViewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory(appContainer.authRepository))
+    val authUiState by
+    authViewModel.uiState.collectAsStateWithLifecycle()
     val navController = rememberNavController()
-    val viewModel: TutorLinkViewModel = viewModel()
-    val sessions by viewModel.sessions.collectAsStateWithLifecycle()
+    val viewModel: TutorLinkViewModel = viewModel(
+        factory = TutorLinkViewModelFactory(
+            catalogRepository = appContainer.catalogRepository,
+            sessionRepository = appContainer.sessionRepository,
+            favoritesRepository = appContainer.favoritesRepository,
+            searchHistoryRepository = appContainer.searchHistoryRepository,
+            authRepository = appContainer.authRepository
+        )
+    )
+    val homeUiState by viewModel.homeUiState.collectAsStateWithLifecycle()
+    val searchUiState by viewModel.searchUiState.collectAsStateWithLifecycle()
+    val calendarUiState by viewModel.calendarUiState.collectAsStateWithLifecycle()
+    val bookingUiState by viewModel.bookingUiState.collectAsStateWithLifecycle()
     val backStackEntry by
     navController.currentBackStackEntryAsState()
     val currentRoute =
@@ -43,7 +66,7 @@ fun TutorLinkNavHost() {
     val showAppBars = currentRoute in appBarRoutes
 
     Scaffold(
-        containerColor = TutorLinkBackground,
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             if (showAppBars) {
                 TutorLinkTopBar(
@@ -83,8 +106,16 @@ fun TutorLinkNavHost() {
         ) {
             composable(Destination.Login.route) {
                 LoginScreen(
+                    uiState = authUiState,
+                    onNameChanged = authViewModel::onNameChanged,
+                    onEmailChanged = authViewModel::onEmailChanged,
+                    onPasswordChanged = authViewModel::onPasswordChanged,
+                    onSubmit = authViewModel::submit,
+                    onToggleMode = authViewModel::toggleMode,
                     onLoginSuccess = {
-                        navController.navigate(Destination.Home.route) {
+                        navController.navigate(
+                            Destination.Home.route
+                        ) {
                             popUpTo(Destination.Login.route) {
                                 inclusive = true
                             }
@@ -94,13 +125,13 @@ fun TutorLinkNavHost() {
                 )
             }
             composable(Destination.Home.route) {
-                val nextSession = sessions
-                    .filter { it.status == TutoringStatus.UPCOMING }
-                    .minWithOrNull(compareBy({ it.date }, { it.time }))
                 HomeScreen(
-                    categories = viewModel.categories,
-                    recommendedTutors = viewModel.tutors.take(3),
-                    nextSession = nextSession,
+                    categories = homeUiState.categories,
+                    recommendedTutors = homeUiState.recommendedTutors,
+                    nextSession = homeUiState.nextSession,
+                    loadState = homeUiState.loadState,
+                    errorMessage = homeUiState.errorMessage,
+                    onRetry = viewModel::retryLoading,
                     onSearchClick = {
                         navController.navigate(Destination.Search.route) {
                             launchSingleTop = true
@@ -120,9 +151,16 @@ fun TutorLinkNavHost() {
             }
             composable(Destination.Search.route) {
                 SearchScreen(
-                    tutors = viewModel.tutors,
-                    categories = viewModel.categories,
+                    uiState = searchUiState,
+                    onQueryChanged = viewModel::onSearchQueryChanged,
+                    onClearQuery = viewModel::clearSearchQuery,
+                    onCategorySelected = viewModel::onSearchCategorySelected,
+                    onSearchSubmitted = viewModel::onSearchSubmitted,
+                    onHistorySelected = viewModel::onSearchHistorySelected,
+                    onClearHistory = viewModel::clearSearchHistory,
+                    onRetry = viewModel::retryLoading,
                     onTutorClick = { tutor ->
+                        viewModel.onSearchSubmitted()
                         navController.navigate(
                             Destination.TutorDetail.createRoute(tutor.id)
                         ) {
@@ -132,12 +170,16 @@ fun TutorLinkNavHost() {
                 )
             }
             composable(Destination.Calendar.route) {
-                CalendarScreen(sessions = sessions)
+                CalendarScreen(
+                    uiState = calendarUiState,
+                    onFilterSelected = viewModel::onSessionFilterSelected,
+                    onRetry = viewModel::retryLoading
+                )
             }
             composable(
                 route = Destination.TutorDetail.route,
-                arguments = listOf(
-                    navArgument("tutorId") { type = NavType.StringType }
+                arguments = listOf(navArgument("tutorId") { type = NavType.StringType }),
+                deepLinks = listOf(navDeepLink { uriPattern = "tutorlink://tutor/{tutorId}" }
                 )
             ) { entry ->
                 val tutorId = entry.arguments?.getString("tutorId")
@@ -146,8 +188,16 @@ fun TutorLinkNavHost() {
                 if (tutor != null) {
                     TutorDetailScreen(
                         tutor = tutor,
+                        uiState = bookingUiState,
+                        onBookingStarted = {
+                            viewModel.beginBooking(tutor.id, entry.id)
+                        },
+                        onTopicChanged = viewModel::onBookingTopicChanged,
+                        onDateChanged = viewModel::onBookingDateChanged,
+                        onTimeChanged = viewModel::onBookingTimeChanged,
+                        onNotesChanged = viewModel::onBookingNotesChanged,
+                        onSubmit = { viewModel.submitBooking(tutor) },
                         onBack = { navController.popBackStack() },
-                        onReservationConfirmed = viewModel::addReservation,
                         onViewCalendar = {
                             navController.navigate(Destination.Calendar.route) {
                                 popUpTo(Destination.Home.route) {
@@ -158,11 +208,23 @@ fun TutorLinkNavHost() {
                             }
                         }
                     )
+                } else {
+                    Column {
+                        DataStatus(
+                            loadState = if (homeUiState.loadState == UiLoadState.LOADING) UiLoadState.LOADING else UiLoadState.ERROR,
+                            errorMessage = if (homeUiState.loadState == UiLoadState.LOADING) null else "No se encontró el tutor. Revisa la conexión o vuelve a buscar.",
+                            onRetry = viewModel::retryLoading
+                        )
+                        TextButton(onClick = { navController.popBackStack() }) { Text("Volver") }
+                    }
                 }
             }
             composable(Destination.Settings.route) {
                 SettingsScreen(
+                    darkModeEnabled = darkModeEnabled,
+                    onDarkModeChanged = onDarkModeChanged,
                     onLogout = {
+                        authViewModel.signOut()
                         navController.navigate(Destination.Login.route) {
                             popUpTo(navController.graph.id) {
                                 inclusive = true
