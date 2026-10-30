@@ -20,6 +20,7 @@ data class SearchUiState(
     val selectedCategoryId: String? = null,
     val categories: List<SubjectCategory> = emptyList(),
     val filteredTutors: List<Tutor> = emptyList(),
+    val history: List<String> = emptyList(),
     val loadState: UiLoadState = UiLoadState.CONTENT,
     val errorMessage: String? = null
 ) {

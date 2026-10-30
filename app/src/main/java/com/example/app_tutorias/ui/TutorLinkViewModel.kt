@@ -51,6 +51,7 @@ class TutorLinkViewModel(
     private var bookingJob: Job? = null
     private var reservationId: String? = null
     private var userId: String? = null
+    private var searchHistory: List<String> = emptyList()
 
     private val _sessions = MutableStateFlow<List<TutoringSession>>(emptyList())
     val sessions = _sessions.asStateFlow()
@@ -65,6 +66,16 @@ class TutorLinkViewModel(
     private val reloadRequests = MutableStateFlow(0)
 
     init {
+        // Room keeps the history per user and works without a connection,
+        // so it is observed apart from the Firestore streams.
+        viewModelScope.launch {
+            searchHistoryRepository.observeHistory()
+                .catch { emit(emptyList()) }
+                .collect { history ->
+                    searchHistory = history.map { it.query }
+                    refreshStates()
+                }
+        }
         viewModelScope.launch {
             authRepository.currentUserId.distinctUntilChanged().collectLatest { currentUserId ->
                 userId = currentUserId
@@ -174,6 +185,38 @@ class TutorLinkViewModel(
 
     fun clearSearchQuery() = onSearchQueryChanged("")
 
+    fun onSearchSubmitted() = saveSearch(_searchUiState.value.query)
+
+    fun onSearchHistorySelected(query: String) {
+        onSearchQueryChanged(query)
+        saveSearch(query)
+    }
+
+    fun clearSearchHistory() {
+        viewModelScope.launch {
+            try {
+                searchHistoryRepository.clearHistory()
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (_: Exception) {
+                // Nothing to clear when there is no active user.
+            }
+        }
+    }
+
+    private fun saveSearch(query: String) {
+        if (query.isBlank()) return
+        viewModelScope.launch {
+            try {
+                searchHistoryRepository.saveSearch(query)
+            } catch (exception: CancellationException) {
+                throw exception
+            } catch (_: Exception) {
+                // The history is a convenience; a failed local write must not block searching.
+            }
+        }
+    }
+
     fun onSearchCategorySelected(categoryId: String?) {
         _searchUiState.update {
             it.copy(selectedCategoryId = if (categoryId == it.selectedCategoryId) null else categoryId)
@@ -256,7 +299,7 @@ class TutorLinkViewModel(
             errorMessage = catalogError ?: sessionError
         )
         _searchUiState.update {
-            it.copy(categories = categories, filteredTutors = filterTutors(tutors, it.query, it.selectedCategoryId), loadState = catalogLoadState, errorMessage = catalogError)
+            it.copy(categories = categories, filteredTutors = filterTutors(tutors, it.query, it.selectedCategoryId), history = searchHistory, loadState = catalogLoadState, errorMessage = catalogError)
         }
         _calendarUiState.update { state ->
             val visible = when (state.selectedFilter) {

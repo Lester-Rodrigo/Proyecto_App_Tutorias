@@ -12,6 +12,8 @@
     <string name="search_title">Encuentra tu tutor</string>
     <string name="search_subtitle">Filtra por materia o escribe lo que necesitas aprender.</string>
     <string name="clear_search">Limpiar búsqueda</string>
+    <string name="recent_searches">Búsquedas recientes</string>
+    <string name="clear_history">Borrar historial</string>
     <string name="all_subjects">Todas</string>
     <string name="no_tutors_title">No encontramos tutores</string>
     <string name="no_tutors_description">Prueba con otro nombre, materia o filtro.</string>

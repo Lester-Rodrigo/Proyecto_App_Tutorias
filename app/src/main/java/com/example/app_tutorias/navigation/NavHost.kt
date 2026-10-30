@@ -155,8 +155,12 @@ fun TutorLinkNavHost(appContainer: AppContainer, darkModeEnabled: Boolean, onDar
                     onQueryChanged = viewModel::onSearchQueryChanged,
                     onClearQuery = viewModel::clearSearchQuery,
                     onCategorySelected = viewModel::onSearchCategorySelected,
+                    onSearchSubmitted = viewModel::onSearchSubmitted,
+                    onHistorySelected = viewModel::onSearchHistorySelected,
+                    onClearHistory = viewModel::clearSearchHistory,
                     onRetry = viewModel::retryLoading,
                     onTutorClick = { tutor ->
+                        viewModel.onSearchSubmitted()
                         navController.navigate(
                             Destination.TutorDetail.createRoute(tutor.id)
                         ) {

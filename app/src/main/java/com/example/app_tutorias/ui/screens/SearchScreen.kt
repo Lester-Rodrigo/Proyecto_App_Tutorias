@@ -3,24 +3,35 @@ package com.example.app_tutorias.ui.screens
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Clear
+import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material3.AssistChip
+import androidx.compose.material3.AssistChipDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.app_tutorias.R
@@ -40,10 +51,20 @@ fun SearchScreen(
     onClearQuery: () -> Unit,
     onCategorySelected: (String?) -> Unit,
     onTutorClick: (Tutor) -> Unit,
+    onSearchSubmitted: () -> Unit = {},
+    onHistorySelected: (String) -> Unit = {},
+    onClearHistory: () -> Unit = {},
     onRetry: () -> Unit = {}
 ) {
+    val focusManager = LocalFocusManager.current
     if (uiState.loadState == UiLoadState.LOADING || uiState.loadState == UiLoadState.ERROR) {
-        DataStatus(uiState.loadState, uiState.errorMessage, onRetry)
+        // The history lives in Room, so it stays available while the catalog cannot load.
+        Column(modifier = Modifier.fillMaxSize()) {
+            DataStatus(uiState.loadState, uiState.errorMessage, onRetry)
+            if (uiState.history.isNotEmpty()) {
+                SearchHistorySection(uiState.history, onHistorySelected, onClearHistory)
+            }
+        }
         return
     }
     Column(
@@ -83,6 +104,13 @@ fun SearchScreen(
                 }
             },
             singleLine = true,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+            keyboardActions = KeyboardActions(
+                onSearch = {
+                    onSearchSubmitted()
+                    focusManager.clearFocus()
+                }
+            ),
             shape = MaterialTheme.shapes.medium
         )
         LazyRow(
@@ -103,6 +131,9 @@ fun SearchScreen(
                     label = { Text(category.name) }
                 )
             }
+        }
+        if (uiState.query.isBlank() && uiState.history.isNotEmpty()) {
+            SearchHistorySection(uiState.history, onHistorySelected, onClearHistory)
         }
 
         if (uiState.filteredTutors.isEmpty()) {
@@ -134,6 +165,49 @@ fun SearchScreen(
     }
 }
 
+@Composable
+private fun SearchHistorySection(
+    history: List<String>,
+    onHistorySelected: (String) -> Unit,
+    onClearHistory: () -> Unit
+) {
+    Column(modifier = Modifier.fillMaxWidth().padding(top = 12.dp)) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 20.dp, end = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.recent_searches),
+                style = MaterialTheme.typography.titleSmall
+            )
+            TextButton(onClick = onClearHistory) {
+                Text(stringResource(R.string.clear_history))
+            }
+        }
+        LazyRow(
+            contentPadding = PaddingValues(horizontal = 20.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            items(history, key = { it }) { query ->
+                AssistChip(
+                    onClick = { onHistorySelected(query) },
+                    label = { Text(query) },
+                    leadingIcon = {
+                        Icon(
+                            Icons.Outlined.History,
+                            contentDescription = null,
+                            modifier = Modifier.size(AssistChipDefaults.IconSize)
+                        )
+                    }
+                )
+            }
+        }
+    }
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun SearchScreenPreview() {
@@ -141,7 +215,8 @@ private fun SearchScreenPreview() {
         SearchScreen(
             uiState = SearchUiState(
                 categories = MockData.categories,
-                filteredTutors = MockData.tutors
+                filteredTutors = MockData.tutors,
+                history = listOf("Álgebra", "Kotlin")
             ),
             onQueryChanged = {},
             onClearQuery = {},

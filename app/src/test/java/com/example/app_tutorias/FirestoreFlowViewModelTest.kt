@@ -15,6 +15,7 @@ import com.example.app_tutorias.domain.repository.SessionRepository
 import com.example.app_tutorias.ui.SessionFilter
 import com.example.app_tutorias.ui.TutorLinkViewModel
 import com.example.app_tutorias.ui.UiLoadState
+import java.time.Instant
 import java.time.LocalDate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -43,6 +44,7 @@ class FirestoreFlowViewModelTest {
     private val auth = FakeAuthRepository()
     private val catalog = FakeCatalogRepository()
     private val sessions = FakeSessionRepository()
+    private val searchHistory = FakeSearchHistoryRepository()
 
     @Before
     fun setUp() { Dispatchers.setMain(dispatcher) }
@@ -134,6 +136,37 @@ class FirestoreFlowViewModelTest {
         assertEquals(UiLoadState.ERROR, viewModel.searchUiState.value.loadState)
     }
 
+    @Test
+    fun `submitted searches are saved in history and can be reused`() = runTest(dispatcher) {
+        val viewModel = createViewModel()
+        runCurrent()
+        viewModel.onSearchQueryChanged("Álgebra")
+        viewModel.onSearchSubmitted()
+        viewModel.onSearchQueryChanged("Kotlin")
+        viewModel.onSearchSubmitted()
+        viewModel.onSearchQueryChanged("   ")
+        viewModel.onSearchSubmitted()
+        runCurrent()
+        assertEquals(listOf("Kotlin", "Álgebra"), viewModel.searchUiState.value.history)
+        viewModel.onSearchHistorySelected("Álgebra")
+        runCurrent()
+        assertEquals("Álgebra", viewModel.searchUiState.value.query)
+        assertEquals(listOf("Álgebra", "Kotlin"), viewModel.searchUiState.value.history)
+        viewModel.clearSearchHistory()
+        runCurrent()
+        assertTrue(viewModel.searchUiState.value.history.isEmpty())
+    }
+
+    @Test
+    fun `history stays visible when the catalog cannot load`() = runTest(dispatcher) {
+        searchHistory.saveSearch("Física")
+        catalog.tutorFlow = flow { throw IllegalStateException("offline") }
+        val viewModel = createViewModel()
+        runCurrent()
+        assertEquals(UiLoadState.ERROR, viewModel.searchUiState.value.loadState)
+        assertEquals(listOf("Física"), viewModel.searchUiState.value.history)
+    }
+
     private fun fillBooking(viewModel: TutorLinkViewModel) {
         viewModel.beginBooking("tutor-1", "detail-1")
         viewModel.onBookingTopicChanged("Álgebra")
@@ -149,11 +182,7 @@ class FirestoreFlowViewModelTest {
             override suspend fun addFavorite(tutorId: String, tutorName: String) = Result.success(Unit)
             override suspend fun removeFavorite(tutorId: String) = Result.success(Unit)
         },
-        searchHistoryRepository = object : SearchHistoryRepository {
-            override fun observeHistory(): Flow<List<SearchHistoryItem>> = emptyFlow()
-            override suspend fun saveSearch(query: String) = Unit
-            override suspend fun clearHistory() = Unit
-        },
+        searchHistoryRepository = searchHistory,
         authRepository = auth
     )
 }
@@ -172,6 +201,18 @@ private class FakeCatalogRepository : CatalogRepository {
     override fun observeTutors(): Flow<List<Tutor>> = tutorFlow
     override fun observeTutor(tutorId: String): Flow<Tutor?> = flowOf(tutor)
     override fun observeSubjects(): Flow<List<Subject>> = flowOf(listOf(Subject("math", "Matemáticas", "math", "📐")))
+}
+
+private class FakeSearchHistoryRepository : SearchHistoryRepository {
+    private val history = MutableStateFlow<List<SearchHistoryItem>>(emptyList())
+    override fun observeHistory(): Flow<List<SearchHistoryItem>> = history
+    override suspend fun saveSearch(query: String) {
+        val normalizedQuery = query.trim()
+        if (normalizedQuery.isBlank()) return
+        val item = SearchHistoryItem(userId = "student-1", query = normalizedQuery, searchedAt = Instant.now())
+        history.value = listOf(item) + history.value.filterNot { it.query == normalizedQuery }
+    }
+    override suspend fun clearHistory() { history.value = emptyList() }
 }
 
 private class FakeSessionRepository : SessionRepository {
