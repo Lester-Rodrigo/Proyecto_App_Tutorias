@@ -38,7 +38,7 @@ Con autorización del usuario se crearon estos ocho documentos en `app-tutorias-
 
 Son datos de demostración tomados de `MockData.kt`. Se conservaron los nombres, iniciales, descripciones, precios y calificaciones. Las tarifas se guardaron como enteros, las calificaciones como decimales y `subjectIds` como listas de texto. Los horarios relativos de los mocks ("Hoy", "Mañana") no se convirtieron en disponibilidad recurrente: al no haber horarios estructurados, la app muestra su aviso para consultar disponibilidad. `ratingCount` conserva el valor predeterminado del modelo (0).
 
-Se verificó en la consola la existencia de los cuatro documentos de cada colección y sus relaciones al guardarlos. No se insertaron reservas ni se modificaron perfiles de usuario. Falta verificar una reserva realizada desde la app.
+Se verificó en la consola la existencia de los cuatro documentos de cada colección y sus relaciones al guardarlos. No se insertaron reservas ni se modificaron perfiles de usuario. La reserva real y su sincronización se verificaron el 30/10/2026 desde la app: [evidencias](entrega-4/evidencias/README.md).
 
 ![Catálogo cargado en Firestore](testeo/capturas/firestore-catalogo.jpg)
 
@@ -79,7 +79,7 @@ Firestore mantiene caché local en Android. Una lectura puede devolver datos gua
 
 Una reserva espera hasta 10 segundos por confirmación del servidor. Si el servidor no confirma todavía, se muestra **Pendiente de sincronizar**, se detiene el indicador y se bloquea un segundo envío del mismo formulario. Firestore conserva la escritura en su cola; el tiempo de espera no la cancela. El calendario distingue documentos pendientes de los confirmados usando los metadatos del snapshot. Si el servidor rechaza una escritura, se muestra un error.
 
-Verificación manual pendiente con acceso al proyecto y dispositivo:
+Guion de verificación. Los puntos ejecutados y las limitaciones están en las [evidencias del 30/10/2026](entrega-4/evidencias/README.md):
 
 1. Recorrer Inicio → Buscar → Tutor → Reservar → Calendario con conexión.
 2. Confirmar el documento en la consola de Firebase.
@@ -88,6 +88,6 @@ Verificación manual pendiente con acceso al proyecto y dispositivo:
 5. Restaurar la red y comprobar que el estado pendiente desaparece y existe un solo documento.
 6. Probar permisos denegados y catálogo vacío en un entorno de pruebas.
 
-La persistencia de Firestore no reemplaza el requisito de Room de la Entrega 4; el historial local todavía requiere su propia conexión con la UI.
+La persistencia de Firestore no reemplaza el requisito de Room de la Entrega 4; el historial local está conectado a la UI y su persistencia sin red se verificó tras cerrar completamente la app.
 
 Referencias: [caché sin conexión](https://firebase.google.com/docs/firestore/manage-data/enable-offline) y [metadatos de escrituras pendientes](https://firebase.google.com/docs/firestore/query-data/listen).

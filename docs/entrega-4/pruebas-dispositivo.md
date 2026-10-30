@@ -1,6 +1,8 @@
 # Pruebas en dispositivo · Entrega 4
 
-Registro de las pruebas manuales de reserva real, modo avión e historial local.
+Registro de comprobaciones de reserva real, modo avión e historial local.
+
+**Ejecución del 30/10/2026:** reserva con conexión, reserva pendiente en modo avión, sincronización y persistencia del historial tras cierre completo verificadas en el emulador. [Video, capturas y resultados observados](evidencias/README.md). Las casillas vacías de la plantilla inferior no representan comprobaciones aprobadas.
 Hacerlas en un teléfono o emulador con la rama `entrega-4` y una cuenta de prueba.
 
 **Dispositivo:** ______ · **Android:** ______ · **Cuenta:** ______ · **Fecha:** ______

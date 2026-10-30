@@ -7,7 +7,9 @@
 TutorLink deja de usar datos mock en el flujo principal. El catálogo y las reservas vienen de Cloud Firestore a través de
 repositorios. La app funciona sin conexión gracias a la caché de Firestore. El historial de búsquedas se guarda en Room.
 
-**Video (máx. 3 min, continuo):** <enlace>
+**Video (2 min 41 s, continuo):** [Ver grabación](evidencias/video-entrega-4.mp4)
+
+**Evidencias ejecutadas:** [Capturas, resultados e IDs de Firestore](evidencias/README.md). Pendientes: captura de la consola web, task test externo e historias de la Entrega 2.
 
 ## Qué incluye
 
