@@ -30,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
@@ -150,7 +151,7 @@ fun SearchScreen(
                 item {
                     Text(
                         text = if (uiState.hasActiveFilter) {
-                            stringResource(R.string.results_count, uiState.filteredTutors.size)
+                            pluralStringResource(R.plurals.results_count, uiState.filteredTutors.size, uiState.filteredTutors.size)
                         } else {
                             stringResource(R.string.available_tutors)
                         },
