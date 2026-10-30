@@ -39,9 +39,13 @@ Los JSON se obtuvieron con `Source.SERVER` desde el SDK autenticado de la app. S
 no son capturas de la consola web. Se pueden localizar esos mismos IDs en Firestore → Datos → sessions.
 Las otras reservas que aparecen en el calendario corresponden a las tomas previas de esta grabación.
 
+## Captura de la consola de Firebase
+
+El usuario aportó la [captura de la reserva con conexión en la consola](11-firestore-consola-reserva-online.png). Muestra el documento `31db179b-29dc-4251-bd21-0ba1c8322a96`, sus relaciones, horario y estado `UPCOMING`, coincidentes con el snapshot del servidor.
+
 ## Alcance de la evidencia
 
-Quedan pendientes la captura visual en la consola de Firebase, el task test con una persona externa y la
+Quedan pendientes la captura visual en la consola de la reserva sincronizada (`e0d0e967-2116-476a-9442-484bb29f3d1e`), el task test con una persona externa y la
 vinculación de las historias de la Entrega 2. No se presentan como realizadas las comprobaciones adicionales de
 borrar historial, cambiar de cuenta, reutilizar un chip o cerrar la app mientras hay una reserva pendiente.
 El control de permisos de esta sesión bloqueó la apertura de la consola de Firebase en el navegador.

@@ -9,7 +9,7 @@ repositorios. La app funciona sin conexión gracias a la caché de Firestore. El
 
 **Video (2 min 41 s, continuo):** [Ver grabación](evidencias/video-entrega-4.mp4)
 
-**Evidencias ejecutadas:** [Capturas, resultados e IDs de Firestore](evidencias/README.md). Pendientes: captura de la consola web, task test externo e historias de la Entrega 2.
+**Evidencias ejecutadas:** [Capturas, resultados e IDs de Firestore](evidencias/README.md). Captura de la reserva con conexión en la consola añadida. Pendientes: captura de la reserva sincronizada en la consola, task test externo e historias de la Entrega 2.
 
 ## Qué incluye
 
