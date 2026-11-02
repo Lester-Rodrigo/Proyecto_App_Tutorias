@@ -45,8 +45,9 @@ El usuario aportó la [captura de la reserva con conexión en la consola](11-fir
 
 ## Alcance de la evidencia
 
-Quedan pendientes la captura visual en la consola de la reserva sincronizada (`e0d0e967-2116-476a-9442-484bb29f3d1e`), el task test con una persona externa y la
-vinculación de las historias de la Entrega 2. No se presentan como realizadas las comprobaciones adicionales de
+El [task test de Anna Bran del 28/10/2026](../task-test.md) está documentado a partir del relato del equipo: reserva y localización en el calendario completadas sin ayuda. Se registraron dificultades con la confirmación, el calendario y la localización de la cancelación. La versión probada, los tiempos y la valoración no fueron registrados.
+
+Quedan pendientes la captura visual en la consola de la reserva sincronizada (`e0d0e967-2116-476a-9442-484bb29f3d1e`) y la vinculación de las historias de la Entrega 2. No se presentan como realizadas las comprobaciones adicionales de
 borrar historial, cambiar de cuenta, reutilizar un chip o cerrar la app mientras hay una reserva pendiente.
 El control de permisos de esta sesión bloqueó la apertura de la consola de Firebase en el navegador.
 
