@@ -3,6 +3,7 @@ package com.example.app_tutorias
 import com.example.app_tutorias.data.BookingFieldError
 import com.example.app_tutorias.data.BookingFormData
 import com.example.app_tutorias.data.MAX_NOTES_LENGTH
+import com.example.app_tutorias.data.normalized
 import com.example.app_tutorias.data.validateBookingForm
 import java.time.LocalDate
 import org.junit.Assert.assertEquals
@@ -41,6 +42,28 @@ class BookingValidationTest {
         assertNull(result.dateError)
         assertNull(result.timeError)
         assertNull(result.notesError)
+    }
+
+    @Test
+    fun `leading and trailing whitespace is accepted and normalized`() {
+        val form = validForm(
+            topic = "  Álgebra lineal  ",
+            date = " 2026-09-21 ",
+            time = " 10:23 ",
+            notes = "  Llevar ejercicios.  "
+        )
+        val result = validateBookingForm(form, today)
+        val normalized = form.normalized()
+
+        assertTrue(result.isValid)
+        assertNull(result.topicError)
+        assertNull(result.dateError)
+        assertNull(result.timeError)
+        assertNull(result.notesError)
+        assertEquals("Álgebra lineal", normalized.topic)
+        assertEquals("2026-09-21", normalized.date)
+        assertEquals("10:23", normalized.time)
+        assertEquals("Llevar ejercicios.", normalized.notes)
     }
 
     @Test

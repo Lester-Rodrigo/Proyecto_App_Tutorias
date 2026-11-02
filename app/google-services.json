@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "716973274515",
+    "project_id": "app-tutorias-5710d",
+    "storage_bucket": "app-tutorias-5710d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:716973274515:android:f02a77c509c87dd1792466",
+        "android_client_info": {
+          "package_name": "com.example.app_tutorias"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBztQUjbISsvYrhJpR8ZrxNQmcZrCdvFTs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,48 @@
+{
+  "uid": "Now9iMaw0tTHThI9aJHUvFEuh9r2",
+  "device": "sdk_gphone16k_x86_64",
+  "android": "17",
+  "accountEmail": "entrega4.1793340103@example.com",
+  "steps": [
+    {
+      "step": "01-catalogo-firestore",
+      "timeUtc": "2026-10-30T06:13:41.113511Z"
+    },
+    {
+      "step": "02-formulario-conexion",
+      "timeUtc": "2026-10-30T06:14:01.626974Z"
+    },
+    {
+      "step": "03-reserva-confirmada",
+      "timeUtc": "2026-10-30T06:14:10.140227Z"
+    },
+    {
+      "step": "04-calendario-confirmado",
+      "timeUtc": "2026-10-30T06:14:18.714971Z"
+    },
+    {
+      "step": "05-historial-y-cache-modo-avion",
+      "timeUtc": "2026-10-30T06:14:37.499391Z"
+    },
+    {
+      "step": "06-formulario-sin-conexion",
+      "timeUtc": "2026-10-30T06:14:56.915632Z"
+    },
+    {
+      "step": "07-reserva-pendiente",
+      "timeUtc": "2026-10-30T06:15:12.293378Z"
+    },
+    {
+      "step": "08-calendario-pendiente",
+      "timeUtc": "2026-10-30T06:15:20.768337Z"
+    },
+    {
+      "step": "09-calendario-sincronizado",
+      "timeUtc": "2026-10-30T06:15:33.623740Z"
+    }
+  ],
+  "onlineReservationId": "31db179b-29dc-4251-bd21-0ba1c8322a96",
+  "airplaneMode": "1",
+  "status": "PASS",
+  "sessionCount": 5
+}

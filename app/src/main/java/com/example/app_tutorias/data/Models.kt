@@ -35,5 +35,6 @@ data class TutoringSession(
     val date: LocalDate,
     val time: LocalTime,
     val notes: String,
-    val status: TutoringStatus
+    val status: TutoringStatus,
+    val isPendingSync: Boolean = false
 )
