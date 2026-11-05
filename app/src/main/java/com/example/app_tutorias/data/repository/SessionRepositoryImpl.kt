@@ -6,6 +6,7 @@ import com.example.app_tutorias.data.remote.firestore.SessionRemoteDataSource
 import com.example.app_tutorias.domain.model.TutoringSession
 import com.example.app_tutorias.domain.model.TutoringStatus
 import com.example.app_tutorias.domain.model.SessionWriteResult
+import com.example.app_tutorias.domain.validation.BookingValidator
 import kotlinx.coroutines.CancellationException
 import com.example.app_tutorias.domain.repository.SessionRepository
 import kotlinx.coroutines.flow.Flow
@@ -25,6 +26,7 @@ class SessionRepositoryImpl(
     override suspend fun createSession(
         session: TutoringSession
     ): Result<SessionWriteResult> = try {
+        BookingValidator.validate(session)
         Result.success(remoteDataSource.createSession(session.toDto()))
     } catch (exception: CancellationException) {
         throw exception
