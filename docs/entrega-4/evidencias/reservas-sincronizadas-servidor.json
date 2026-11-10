@@ -1,0 +1,97 @@
+{
+  "source": "Source.SERVER",
+  "projectId": "app-tutorias-5710d",
+  "observedAtUtc": "2026-10-30T06:15:33.632132Z",
+  "documents": [
+    {
+      "id": "31db179b-29dc-4251-bd21-0ba1c8322a96",
+      "fields": {
+        "studentId": "Now9iMaw0tTHThI9aJHUvFEuh9r2",
+        "createdAt": "2026-10-30T06:14:01.670Z",
+        "tutorId": "ana-morales",
+        "tutorName": "Ana Morales",
+        "notes": "",
+        "studentName": "Prueba Entrega 4",
+        "id": "31db179b-29dc-4251-bd21-0ba1c8322a96",
+        "endAt": "2026-11-01T23:00:00Z",
+        "subjectId": "math",
+        "startAt": "2026-11-01T22:00:00Z",
+        "status": "UPCOMING",
+        "subjectName": "Ecuaciones con conexion"
+      },
+      "hasPendingWrites": false
+    },
+    {
+      "id": "9eb0f01e-650c-42d1-b48c-aeae0145f8d2",
+      "fields": {
+        "studentId": "Now9iMaw0tTHThI9aJHUvFEuh9r2",
+        "createdAt": "2026-10-30T06:07:39.625Z",
+        "tutorId": "ana-morales",
+        "tutorName": "Ana Morales",
+        "notes": "",
+        "studentName": "Prueba Entrega 4",
+        "id": "9eb0f01e-650c-42d1-b48c-aeae0145f8d2",
+        "endAt": "2026-11-01T23:00:00Z",
+        "startAt": "2026-11-01T22:00:00Z",
+        "subjectId": "math",
+        "status": "UPCOMING",
+        "subjectName": "Ecuaciones con conexion"
+      },
+      "hasPendingWrites": false
+    },
+    {
+      "id": "9ff29028-040a-40c2-ad2d-8ffe75d0be33",
+      "fields": {
+        "studentId": "Now9iMaw0tTHThI9aJHUvFEuh9r2",
+        "createdAt": "2026-10-30T06:11:30.252Z",
+        "tutorId": "ana-morales",
+        "tutorName": "Ana Morales",
+        "notes": "",
+        "studentName": "Prueba Entrega 4",
+        "id": "9ff29028-040a-40c2-ad2d-8ffe75d0be33",
+        "endAt": "2026-11-01T23:00:00Z",
+        "startAt": "2026-11-01T22:00:00Z",
+        "subjectId": "math",
+        "status": "UPCOMING",
+        "subjectName": "Ecuaciones con conexion"
+      },
+      "hasPendingWrites": false
+    },
+    {
+      "id": "bbb64d01-6bde-4867-b402-d5f74b7a5d92",
+      "fields": {
+        "studentId": "Now9iMaw0tTHThI9aJHUvFEuh9r2",
+        "tutorId": "ana-morales",
+        "createdAt": "2026-10-30T06:09:22.437Z",
+        "tutorName": "Ana Morales",
+        "notes": "",
+        "studentName": "Prueba Entrega 4",
+        "id": "bbb64d01-6bde-4867-b402-d5f74b7a5d92",
+        "endAt": "2026-11-01T23:00:00Z",
+        "startAt": "2026-11-01T22:00:00Z",
+        "subjectId": "math",
+        "status": "UPCOMING",
+        "subjectName": "Ecuaciones con conexion"
+      },
+      "hasPendingWrites": false
+    },
+    {
+      "id": "e0d0e967-2116-476a-9442-484bb29f3d1e",
+      "fields": {
+        "studentId": "Now9iMaw0tTHThI9aJHUvFEuh9r2",
+        "createdAt": "2026-10-30T06:14:56.937Z",
+        "tutorId": "ana-morales",
+        "tutorName": "Ana Morales",
+        "notes": "",
+        "studentName": "Prueba Entrega 4",
+        "id": "e0d0e967-2116-476a-9442-484bb29f3d1e",
+        "endAt": "2026-11-02T00:00:00Z",
+        "startAt": "2026-11-01T23:00:00Z",
+        "subjectId": "math",
+        "subjectName": "Ecuaciones sin conexion",
+        "status": "UPCOMING"
+      },
+      "hasPendingWrites": false
+    }
+  ]
+}

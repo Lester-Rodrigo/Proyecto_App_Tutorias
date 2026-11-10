@@ -10,6 +10,13 @@ data class BookingFormData(
     val notes: String = ""
 )
 
+fun BookingFormData.normalized(): BookingFormData = copy(
+    topic = topic.trim(),
+    date = date.trim(),
+    time = time.trim(),
+    notes = notes.trim()
+)
+
 enum class BookingFieldError {
     REQUIRED,
     TOO_SHORT,
@@ -34,16 +41,18 @@ fun validateBookingForm(
     form: BookingFormData,
     today: LocalDate = LocalDate.now()
 ): BookingValidationResult {
+    val normalizedForm = form.normalized()
+
     val topicError = when {
-        form.topic.isBlank() -> BookingFieldError.REQUIRED
-        form.topic.trim().length < 3 -> BookingFieldError.TOO_SHORT
+        normalizedForm.topic.isBlank() -> BookingFieldError.REQUIRED
+        normalizedForm.topic.length < 3 -> BookingFieldError.TOO_SHORT
         else -> null
     }
 
     val dateError = when {
-        form.date.isBlank() -> BookingFieldError.REQUIRED
+        normalizedForm.date.isBlank() -> BookingFieldError.REQUIRED
         else -> try {
-            if (LocalDate.parse(form.date).isBefore(today)) {
+            if (LocalDate.parse(normalizedForm.date).isBefore(today)) {
                 BookingFieldError.PAST_DATE
             } else {
                 null
@@ -54,12 +63,12 @@ fun validateBookingForm(
     }
 
     val timeError = when {
-        form.time.isBlank() -> BookingFieldError.REQUIRED
-        !TIME_PATTERN.matches(form.time.trim()) -> BookingFieldError.INVALID_TIME
+        normalizedForm.time.isBlank() -> BookingFieldError.REQUIRED
+        !TIME_PATTERN.matches(normalizedForm.time) -> BookingFieldError.INVALID_TIME
         else -> null
     }
 
-    val notesError = if (form.notes.length > MAX_NOTES_LENGTH) {
+    val notesError = if (normalizedForm.notes.length > MAX_NOTES_LENGTH) {
         BookingFieldError.NOTES_TOO_LONG
     } else {
         null

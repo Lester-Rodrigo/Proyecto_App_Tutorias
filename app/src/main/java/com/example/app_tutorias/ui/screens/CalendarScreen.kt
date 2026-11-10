@@ -13,40 +13,30 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.app_tutorias.R
 import com.example.app_tutorias.data.MockData
-import com.example.app_tutorias.data.TutoringSession
-import com.example.app_tutorias.data.TutoringStatus
+import com.example.app_tutorias.ui.CalendarUiState
+import com.example.app_tutorias.ui.SessionFilter
 import com.example.app_tutorias.ui.components.EmptyState
 import com.example.app_tutorias.ui.components.SessionCard
-import com.example.app_tutorias.ui.theme.TutorLinkTextSecondary
 import com.example.app_tutorias.ui.theme.TutorLinkTheme
-
-private enum class SessionFilter {
-    UPCOMING,
-    COMPLETED
-}
+import com.example.app_tutorias.ui.UiLoadState
+import com.example.app_tutorias.ui.components.DataStatus
 
 @Composable
-fun CalendarScreen(sessions: List<TutoringSession>) {
-    var selectedFilter by rememberSaveable { mutableStateOf(SessionFilter.UPCOMING) }
-    val visibleSessions = when (selectedFilter) {
-        SessionFilter.UPCOMING -> sessions
-            .filter { it.status == TutoringStatus.UPCOMING }
-            .sortedWith(compareBy(TutoringSession::date, TutoringSession::time))
-        SessionFilter.COMPLETED -> sessions
-            .filter { it.status == TutoringStatus.COMPLETED }
-            .sortedByDescending { it.date }
+fun CalendarScreen(
+    uiState: CalendarUiState,
+    onFilterSelected: (SessionFilter) -> Unit,
+    onRetry: () -> Unit = {}
+) {
+    if (uiState.loadState == UiLoadState.LOADING || uiState.loadState == UiLoadState.ERROR) {
+        DataStatus(uiState.loadState, uiState.errorMessage, onRetry)
+        return
     }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -60,7 +50,7 @@ fun CalendarScreen(sessions: List<TutoringSession>) {
         Text(
             text = stringResource(R.string.calendar_subtitle),
             style = MaterialTheme.typography.bodyMedium,
-            color = TutorLinkTextSecondary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp)
         )
         Row(
@@ -70,25 +60,25 @@ fun CalendarScreen(sessions: List<TutoringSession>) {
             horizontalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             FilterChip(
-                selected = selectedFilter == SessionFilter.UPCOMING,
-                onClick = { selectedFilter = SessionFilter.UPCOMING },
+                selected = uiState.selectedFilter == SessionFilter.UPCOMING,
+                onClick = { onFilterSelected(SessionFilter.UPCOMING) },
                 label = { Text(stringResource(R.string.upcoming_sessions)) }
             )
             FilterChip(
-                selected = selectedFilter == SessionFilter.COMPLETED,
-                onClick = { selectedFilter = SessionFilter.COMPLETED },
+                selected = uiState.selectedFilter == SessionFilter.COMPLETED,
+                onClick = { onFilterSelected(SessionFilter.COMPLETED) },
                 label = { Text(stringResource(R.string.completed_sessions)) }
             )
         }
 
-        if (visibleSessions.isEmpty()) {
+        if (uiState.visibleSessions.isEmpty()) {
             EmptyState(
-                title = if (selectedFilter == SessionFilter.UPCOMING) {
+                title = if (uiState.selectedFilter == SessionFilter.UPCOMING) {
                     stringResource(R.string.no_upcoming_title)
                 } else {
                     stringResource(R.string.no_completed_title)
                 },
-                description = if (selectedFilter == SessionFilter.UPCOMING) {
+                description = if (uiState.selectedFilter == SessionFilter.UPCOMING) {
                     stringResource(R.string.no_upcoming_description)
                 } else {
                     stringResource(R.string.no_completed_description)
@@ -100,7 +90,7 @@ fun CalendarScreen(sessions: List<TutoringSession>) {
                 contentPadding = PaddingValues(horizontal = 20.dp, vertical = 4.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(visibleSessions, key = { it.id }) { session ->
+                items(uiState.visibleSessions, key = { it.id }) { session ->
                     SessionCard(session = session)
                 }
             }
@@ -112,6 +102,11 @@ fun CalendarScreen(sessions: List<TutoringSession>) {
 @Composable
 private fun CalendarScreenPreview() {
     TutorLinkTheme {
-        CalendarScreen(sessions = MockData.initialSessions())
+        CalendarScreen(
+            uiState = CalendarUiState(
+                visibleSessions = MockData.initialSessions()
+            ),
+            onFilterSelected = {}
+        )
     }
 }
