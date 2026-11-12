@@ -15,6 +15,7 @@ import com.example.tutorlink.domain.repository.CatalogRepository
 import com.example.tutorlink.domain.repository.FavoritesRepository
 import com.example.tutorlink.domain.repository.SearchHistoryRepository
 import com.example.tutorlink.domain.repository.SessionRepository
+import com.example.tutorlink.domain.repository.UserRepository
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
@@ -39,10 +40,14 @@ class TutorLinkViewModel(
     private val sessionRepository: SessionRepository,
     private val favoritesRepository: FavoritesRepository,
     private val searchHistoryRepository: SearchHistoryRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val userRepository: UserRepository
 ) : ViewModel() {
     private var subjects: List<Subject> = emptyList()
-    private var tutors: List<Tutor> = emptyList()
+    private val _tutorCatalog = MutableStateFlow<List<Tutor>>(emptyList())
+    val tutorCatalog = _tutorCatalog.asStateFlow()
+    private val tutors: List<Tutor>
+        get() = _tutorCatalog.value
     private var remoteTutors: List<com.example.tutorlink.domain.model.Tutor> = emptyList()
     private var catalogLoadState = UiLoadState.LOADING
     private var catalogError: String? = null
@@ -51,6 +56,7 @@ class TutorLinkViewModel(
     private var bookingJob: Job? = null
     private var reservationId: String? = null
     private var userId: String? = null
+    private var userName: String? = null
     private var searchHistory: List<String> = emptyList()
 
     private val _sessions = MutableStateFlow<List<TutoringSession>>(emptyList())
@@ -79,11 +85,12 @@ class TutorLinkViewModel(
         viewModelScope.launch {
             authRepository.currentUserId.distinctUntilChanged().collectLatest { currentUserId ->
                 userId = currentUserId
+                userName = null
                 bookingJob?.cancel()
                 _bookingUiState.value = BookingUiState()
                 reservationId = null
                 subjects = emptyList()
-                tutors = emptyList()
+                _tutorCatalog.value = emptyList()
                 remoteTutors = emptyList()
                 _sessions.value = emptyList()
                 _searchUiState.value = SearchUiState()
@@ -114,6 +121,18 @@ class TutorLinkViewModel(
         refreshStates()
         launch {
             observeWithDeadline(
+                source = userRepository.observeCurrentUserProfile(),
+                onError = {
+                    userName = null
+                    refreshStates()
+                }
+            ) { profile ->
+                userName = profile?.takeIf { it.id == userId }?.name?.trim()?.takeIf { it.isNotEmpty() }
+                refreshStates()
+            }
+        }
+        launch {
+            observeWithDeadline(
                 source = combine(catalogRepository.observeTutors(), catalogRepository.observeSubjects()) { tutors, subjects ->
                     tutors to subjects
                 },
@@ -125,7 +144,7 @@ class TutorLinkViewModel(
             ) { (loadedTutors, loadedSubjects) ->
                 subjects = loadedSubjects
                 remoteTutors = loadedTutors
-                tutors = loadedTutors.map { it.toUiModel(subjects) }
+                _tutorCatalog.value = loadedTutors.map { it.toUiModel(subjects) }
                 catalogLoadState = if (tutors.isEmpty()) UiLoadState.EMPTY else UiLoadState.CONTENT
                 catalogError = null
                 refreshStates()
@@ -292,6 +311,7 @@ class TutorLinkViewModel(
     private fun refreshStates() {
         val categories = subjects.map { it.toUiModel() }
         _homeUiState.value = HomeUiState(
+            userName = userName,
             categories = categories,
             recommendedTutors = tutors.take(3),
             nextSession = _sessions.value.filter { it.status == TutoringStatus.UPCOMING }.minWithOrNull(compareBy(TutoringSession::date, TutoringSession::time)),

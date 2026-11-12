@@ -18,7 +18,8 @@ data class Tutor(
     val rating: Double,
     val pricePerHour: Int,
     val availability: String,
-    val categoryIds: List<String>
+    val categoryIds: List<String>,
+    val availableTimes: List<String> = emptyList()
 )
 
 enum class TutoringStatus {

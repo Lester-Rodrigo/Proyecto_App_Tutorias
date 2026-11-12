@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">TutorLink</string>
-    <string name="home_greeting">¡Hola, Andrea!</string>
+    <string name="home_greeting">¡Hola, %1$s!</string>
+    <string name="home_greeting_generic">¡Hola!</string>
+    <string name="no_available_times">No hay horarios publicados. Consulta la disponibilidad con el tutor.</string>
     <string name="home_subtitle">¿Qué quieres aprender hoy?</string>
     <string name="search_hint">Busca por tutor o materia</string>
     <string name="popular_subjects">Materias populares</string>

@@ -7,13 +7,15 @@ import com.example.tutorlink.domain.repository.FavoritesRepository
 import com.example.tutorlink.domain.repository.SearchHistoryRepository
 import com.example.tutorlink.domain.repository.SessionRepository
 import com.example.tutorlink.domain.repository.AuthRepository
+import com.example.tutorlink.domain.repository.UserRepository
 
 class TutorLinkViewModelFactory(
     private val catalogRepository: CatalogRepository,
     private val sessionRepository: SessionRepository,
     private val favoritesRepository: FavoritesRepository,
     private val searchHistoryRepository: SearchHistoryRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val userRepository: UserRepository
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
@@ -31,7 +33,8 @@ class TutorLinkViewModelFactory(
                 favoritesRepository = favoritesRepository,
                 searchHistoryRepository =
                     searchHistoryRepository,
-                authRepository = authRepository
+                authRepository = authRepository,
+                userRepository = userRepository
             ) as T
         }
         throw IllegalArgumentException("ViewModel desconocido: ${modelClass.name}")

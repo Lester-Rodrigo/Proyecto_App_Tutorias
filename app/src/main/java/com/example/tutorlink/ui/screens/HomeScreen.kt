@@ -49,7 +49,8 @@ fun HomeScreen(
     onCalendarClick: () -> Unit,
     loadState: UiLoadState = UiLoadState.CONTENT,
     errorMessage: String? = null,
-    onRetry: () -> Unit = {}
+    onRetry: () -> Unit = {},
+    userName: String? = null
 ) {
     if (loadState != UiLoadState.CONTENT) {
         DataStatus(loadState, errorMessage, onRetry)
@@ -65,7 +66,11 @@ fun HomeScreen(
         item {
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(
-                    text = stringResource(R.string.home_greeting),
+                    text = if (userName.isNullOrBlank()) {
+                        stringResource(R.string.home_greeting_generic)
+                    } else {
+                        stringResource(R.string.home_greeting, userName)
+                    },
                     style = MaterialTheme.typography.headlineMedium
                 )
                 Text(

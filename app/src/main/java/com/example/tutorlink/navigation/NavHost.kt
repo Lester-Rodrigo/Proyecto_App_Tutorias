@@ -46,13 +46,15 @@ fun TutorLinkNavHost(appContainer: AppContainer, darkModeEnabled: Boolean, onDar
             sessionRepository = appContainer.sessionRepository,
             favoritesRepository = appContainer.favoritesRepository,
             searchHistoryRepository = appContainer.searchHistoryRepository,
-            authRepository = appContainer.authRepository
+            authRepository = appContainer.authRepository,
+            userRepository = appContainer.userRepository
         )
     )
     val homeUiState by viewModel.homeUiState.collectAsStateWithLifecycle()
     val searchUiState by viewModel.searchUiState.collectAsStateWithLifecycle()
     val calendarUiState by viewModel.calendarUiState.collectAsStateWithLifecycle()
     val bookingUiState by viewModel.bookingUiState.collectAsStateWithLifecycle()
+    val tutorCatalog by viewModel.tutorCatalog.collectAsStateWithLifecycle()
     val backStackEntry by
     navController.currentBackStackEntryAsState()
     val currentRoute =
@@ -126,6 +128,7 @@ fun TutorLinkNavHost(appContainer: AppContainer, darkModeEnabled: Boolean, onDar
             }
             composable(Destination.Home.route) {
                 HomeScreen(
+                    userName = homeUiState.userName,
                     categories = homeUiState.categories,
                     recommendedTutors = homeUiState.recommendedTutors,
                     nextSession = homeUiState.nextSession,
@@ -183,7 +186,7 @@ fun TutorLinkNavHost(appContainer: AppContainer, darkModeEnabled: Boolean, onDar
                 )
             ) { entry ->
                 val tutorId = entry.arguments?.getString("tutorId")
-                val tutor = tutorId?.let(viewModel::tutorById)
+                val tutor = tutorCatalog.firstOrNull { it.id == tutorId }
 
                 if (tutor != null) {
                     TutorDetailScreen(

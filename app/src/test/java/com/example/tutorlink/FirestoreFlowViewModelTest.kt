@@ -1,6 +1,9 @@
 package com.example.tutorlink
 
 import com.example.tutorlink.domain.model.FavoriteTutor
+import com.example.tutorlink.domain.model.AvailabilitySlot
+import com.example.tutorlink.domain.model.UserProfile
+import com.example.tutorlink.domain.model.UserRole
 import com.example.tutorlink.domain.model.SearchHistoryItem
 import com.example.tutorlink.domain.model.SessionWriteResult
 import com.example.tutorlink.domain.model.Subject
@@ -12,6 +15,7 @@ import com.example.tutorlink.domain.repository.CatalogRepository
 import com.example.tutorlink.domain.repository.FavoritesRepository
 import com.example.tutorlink.domain.repository.SearchHistoryRepository
 import com.example.tutorlink.domain.repository.SessionRepository
+import com.example.tutorlink.domain.repository.UserRepository
 import com.example.tutorlink.ui.SessionFilter
 import com.example.tutorlink.ui.TutorLinkViewModel
 import com.example.tutorlink.ui.UiLoadState
@@ -34,6 +38,7 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -42,6 +47,7 @@ import org.junit.Test
 class FirestoreFlowViewModelTest {
     private val dispatcher = StandardTestDispatcher()
     private val auth = FakeAuthRepository()
+    private val users = FakeUserRepository(auth)
     private val catalog = FakeCatalogRepository()
     private val sessions = FakeSessionRepository()
     private val searchHistory = FakeSearchHistoryRepository()
@@ -167,6 +173,107 @@ class FirestoreFlowViewModelTest {
         assertEquals(listOf("Física"), viewModel.searchUiState.value.history)
     }
 
+    @Test
+    fun `greeting follows profile updates and clears when changing accounts`() = runTest(dispatcher) {
+        val viewModel = createViewModel()
+        runCurrent()
+        assertEquals("Lucía", viewModel.homeUiState.value.userName)
+        users.profiles.getValue("student-1").value = profile("student-1", "  Marta  ")
+        runCurrent()
+        assertEquals("Marta", viewModel.homeUiState.value.userName)
+
+        auth.userId.value = "student-2"
+        runCurrent()
+        assertNull(viewModel.homeUiState.value.userName)
+        // A late update from the previous account must not reach the current screen.
+        users.profiles.getValue("student-1").value = profile("student-1", "Nombre anterior")
+        users.profiles.getValue("student-2").value = profile("student-2", "Diego")
+        runCurrent()
+        assertEquals("Diego", viewModel.homeUiState.value.userName)
+        auth.userId.value = null
+        runCurrent()
+        assertNull(viewModel.homeUiState.value.userName)
+    }
+
+    @Test
+    fun `missing blank or mismatched profile never supplies a greeting name`() = runTest(dispatcher) {
+        users.profiles.getValue("student-1").value = null
+        val viewModel = createViewModel()
+        runCurrent()
+        assertNull(viewModel.homeUiState.value.userName)
+        users.profiles.getValue("student-1").value = profile("student-1", "   ")
+        runCurrent()
+        assertNull(viewModel.homeUiState.value.userName)
+        users.profiles.getValue("student-1").value = profile("student-2", "Otro usuario")
+        runCurrent()
+        assertNull(viewModel.homeUiState.value.userName)
+        assertEquals(UiLoadState.CONTENT, viewModel.homeUiState.value.loadState)
+    }
+
+    @Test
+    fun `profile error does not block catalog or booking and retry restores the name`() = runTest(dispatcher) {
+        users.failure = IllegalStateException("offline without cached profile")
+        val viewModel = createViewModel()
+        runCurrent()
+        assertNull(viewModel.homeUiState.value.userName)
+        assertEquals(UiLoadState.CONTENT, viewModel.homeUiState.value.loadState)
+        fillBooking(viewModel)
+        viewModel.submitBooking(viewModel.searchUiState.value.filteredTutors.single())
+        runCurrent()
+        assertTrue(viewModel.bookingUiState.value.reservationComplete)
+        users.failure = null
+        viewModel.retryLoading()
+        runCurrent()
+        assertEquals("Lucía", viewModel.homeUiState.value.userName)
+    }
+
+    @Test
+    fun `profile deadline keeps catalog usable and a later cached snapshot updates the name`() = runTest(dispatcher) {
+        val profileSource = MutableStateFlow<UserProfile?>(null)
+        users.source = flow { profileSource.collect { if (it != null) emit(it) } }
+        val viewModel = createViewModel()
+        runCurrent()
+        advanceTimeBy(12_001)
+        runCurrent()
+        assertNull(viewModel.homeUiState.value.userName)
+        assertEquals(UiLoadState.CONTENT, viewModel.homeUiState.value.loadState)
+        profileSource.value = profile("student-1", "Nombre en caché")
+        runCurrent()
+        assertEquals("Nombre en caché", viewModel.homeUiState.value.userName)
+    }
+
+    @Test
+    fun `detail availability follows repository snapshots without fabricated times`() = runTest(dispatcher) {
+        val recommended = (1..3).map { catalog.tutor.copy(id = "recommended-$it", name = "Recomendado $it") }
+        val tutorSource = MutableStateFlow(recommended + catalog.tutor.copy(availability = listOf(
+            AvailabilitySlot("monday", 1, "15:00", "18:00"),
+            AvailabilitySlot("wednesday", 3, "09:00", "11:00")
+        )))
+        catalog.tutorFlow = tutorSource
+        val viewModel = createViewModel()
+        runCurrent()
+        viewModel.onSearchQueryChanged("Recomendado")
+        val homeBefore = viewModel.homeUiState.value
+        val searchBefore = viewModel.searchUiState.value
+        assertEquals(listOf("lunes · 15:00–18:00", "miércoles · 09:00–11:00"),
+            viewModel.tutorCatalog.value.last().availableTimes)
+        tutorSource.value = recommended + catalog.tutor.copy(availability = listOf(
+            AvailabilitySlot("tuesday", 2, "10:00", "12:00")
+        ))
+        runCurrent()
+        assertEquals(listOf("martes · 10:00–12:00"), viewModel.tutorCatalog.value.last().availableTimes)
+        // Detail still updates when its tutor is outside recommendations and search results.
+        assertEquals(homeBefore, viewModel.homeUiState.value)
+        assertEquals(searchBefore, viewModel.searchUiState.value)
+        tutorSource.value = recommended + catalog.tutor
+        runCurrent()
+        assertTrue(viewModel.tutorCatalog.value.last().availableTimes.isEmpty())
+        fillBooking(viewModel)
+        viewModel.submitBooking(viewModel.tutorById("tutor-1")!!)
+        runCurrent()
+        assertTrue(viewModel.bookingUiState.value.reservationComplete)
+    }
+
     private fun fillBooking(viewModel: TutorLinkViewModel) {
         viewModel.beginBooking("tutor-1", "detail-1")
         viewModel.onBookingTopicChanged("Álgebra")
@@ -183,8 +290,32 @@ class FirestoreFlowViewModelTest {
             override suspend fun removeFavorite(tutorId: String) = Result.success(Unit)
         },
         searchHistoryRepository = searchHistory,
-        authRepository = auth
+        authRepository = auth,
+        userRepository = users
     )
+}
+
+private fun profile(id: String, name: String) = UserProfile(
+    id = id,
+    name = name,
+    email = "$id@example.com",
+    role = UserRole.STUDENT,
+    emailNotificationsEnabled = true,
+    createdAt = Instant.EPOCH
+)
+
+private class FakeUserRepository(private val auth: FakeAuthRepository) : UserRepository {
+    val profiles = mapOf(
+        "student-1" to MutableStateFlow<UserProfile?>(profile("student-1", "Lucía")),
+        "student-2" to MutableStateFlow<UserProfile?>(null)
+    )
+    var failure: Exception? = null
+    var source: Flow<UserProfile?>? = null
+    override fun observeCurrentUserProfile(): Flow<UserProfile?> {
+        failure?.let { error -> return flow { throw error } }
+        return source ?: profiles.getValue(requireNotNull(auth.userId.value))
+    }
+    override suspend fun updateProfile(profile: UserProfile) = Result.success(Unit)
 }
 
 private class FakeAuthRepository : AuthRepository {

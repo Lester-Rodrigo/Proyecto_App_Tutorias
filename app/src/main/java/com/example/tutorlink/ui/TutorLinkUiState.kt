@@ -11,6 +11,7 @@ data class HomeUiState(
     val categories: List<SubjectCategory> = emptyList(),
     val recommendedTutors: List<Tutor> = emptyList(),
     val nextSession: TutoringSession? = null,
+    val userName: String? = null,
     val loadState: UiLoadState = UiLoadState.CONTENT,
     val errorMessage: String? = null
 )

@@ -12,24 +12,28 @@ import java.util.Locale
 
 fun Subject.toUiModel() = SubjectCategory(id, name, emoji)
 
-fun com.example.tutorlink.domain.model.Tutor.toUiModel(subjects: List<Subject>) = Tutor(
-    id = id,
-    name = name,
-    initials = initials,
-    specialty = subjects.filter { it.id in subjectIds }.joinToString { it.name },
-    description = description,
-    rating = averageRating,
-    pricePerHour = pricePerHour,
-    availability = availability.joinToString { slot ->
+fun com.example.tutorlink.domain.model.Tutor.toUiModel(subjects: List<Subject>): Tutor {
+    val availableTimes = availability.map { slot ->
         val day = if (slot.dayOfWeek in 1..7) {
             DayOfWeek.of(slot.dayOfWeek).getDisplayName(TextStyle.FULL, Locale.forLanguageTag("es"))
         } else {
             "Horario"
         }
         "$day · ${slot.startTime}–${slot.endTime}"
-    }.ifBlank { "Consulta la disponibilidad con el tutor" },
-    categoryIds = subjectIds
-)
+    }
+    return Tutor(
+        id = id,
+        name = name,
+        initials = initials,
+        specialty = subjects.filter { it.id in subjectIds }.joinToString { it.name },
+        description = description,
+        rating = averageRating,
+        pricePerHour = pricePerHour,
+        availability = availableTimes.joinToString().ifBlank { "Consulta la disponibilidad con el tutor" },
+        categoryIds = subjectIds,
+        availableTimes = availableTimes
+    )
+}
 
 fun com.example.tutorlink.domain.model.TutoringSession.toUiModel(): TutoringSession {
     val localStart = startAt.atZone(ZoneId.systemDefault())
