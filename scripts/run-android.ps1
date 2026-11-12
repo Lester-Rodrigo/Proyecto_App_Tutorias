@@ -69,7 +69,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Host "Abriendo TutorLink..." -ForegroundColor Green
-& $adb shell am start -n "com.example.app_tutorias/.MainActivity"
+& $adb shell am start -n "com.example.app_tutorias/com.example.tutorlink.MainActivity"
 if ($LASTEXITCODE -ne 0) {
     exit $LASTEXITCODE
 }

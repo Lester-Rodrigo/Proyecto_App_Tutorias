@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.app_tutorias"
+    namespace = "com.example.tutorlink"
     compileSdk {
         version = release(37)
     }
