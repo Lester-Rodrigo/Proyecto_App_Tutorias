@@ -65,3 +65,9 @@ data class BookingUiState(
     val canSubmit: Boolean
         get() = validation.isValid && !isSubmitting && !reservationComplete
 }
+
+data class TutorDetailUiState(
+    val tutors: List<Tutor> = emptyList(),
+    val loadState: UiLoadState = UiLoadState.LOADING,
+    val errorMessage: String? = null
+)

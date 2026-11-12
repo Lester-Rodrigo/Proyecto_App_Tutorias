@@ -26,9 +26,14 @@ import com.example.tutorlink.domain.repository.ThemeRepository
 import com.example.tutorlink.domain.repository.UserRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.Dispatchers
+import com.example.tutorlink.data.repository.TutorLinkRepositoryImpl
+import com.example.tutorlink.domain.repository.TutorLinkRepository
 
 class AppContainer(context: Context ) {
+    private val dataScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val firebaseAuth: FirebaseAuth = FirebaseAuth.getInstance()
     private val firebaseFirestore: FirebaseFirestore = FirebaseFirestore.getInstance()
     private val authRemoteDataSource = AuthRemoteDataSource(firebaseAuth)
@@ -75,4 +80,11 @@ class AppContainer(context: Context ) {
             authRemoteDataSource = authRemoteDataSource
         )
     val themeRepository: ThemeRepository = ThemeRepositoryImpl(themeDataStore)
+    val tutorLinkRepository: TutorLinkRepository = TutorLinkRepositoryImpl(
+        catalogRepository = catalogRepository,
+        sessionRepository = sessionRepository,
+        authRepository = authRepository,
+        userRepository = userRepository,
+        scope = dataScope
+    )
 }
