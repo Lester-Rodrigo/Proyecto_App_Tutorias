@@ -60,10 +60,11 @@ private val bottomBarItems = listOf(
 @Composable
 fun TutorLinkBottomBar(
     currentRoute: String?,
-    onDestinationSelected: (Destination) -> Unit
+    onDestinationSelected: (Destination) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Surface(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         color = MaterialTheme.colorScheme.surface,
         shape = RoundedCornerShape(
             topStart = 12.dp,
