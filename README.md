@@ -4,6 +4,9 @@ App Android para buscar tutores y reservar tutorías, hecha con **Jetpack Compos
 y **Navigation Compose**. El flujo principal usa Firebase Authentication y Firestore mediante repositorios.
 Consulta la [configuración y verificación de Firestore](docs/firestore.md).
 
+Las correcciones de la entrega final, sus commits y las verificaciones pendientes están en
+[docs/ENTREGA_FINAL_CORRECCIONES.md](docs/ENTREGA_FINAL_CORRECCIONES.md).
+
 ## Entrega 3 · Prototipo navegable
 
 | Evidencia | Enlace |
@@ -32,7 +35,6 @@ Requisitos: Android Studio (incluye el JDK), Android SDK y un emulador o teléfo
 ```bash
 git clone https://github.com/Lester-Rodrigo/Proyecto_App_Tutorias.git
 cd Proyecto_App_Tutorias
-git checkout pantallas-mock
 ```
 
 **En Android Studio:** *File › Open* → elegir la carpeta → esperar la sincronización de Gradle → **Run ▶ app**.
@@ -50,11 +52,14 @@ Si Gradle no encuentra el SDK, crear `local.properties` con
 ## Estructura
 
 ```
-app/src/main/java/com/example/app_tutorias/
+app/src/main/java/com/example/tutorlink/
 ├── MainActivity.kt   # Punto de entrada
+├── TutorLinkApplication.kt # Contenedor de dependencias
+├── di/               # Inyección de repositorios
 ├── navigation/       # Rutas y NavHost
-├── data/             # Modelos, datos mock, validación y filtros
-└── ui/               # ViewModel, componentes, pantallas y tema Material 3
+├── data/             # Firebase, Room, DataStore, repositorios y modelos de UI
+├── domain/           # Modelos, contratos de repositorio y validación
+└── ui/               # ViewModels por pantalla, componentes, pantallas y tema Material 3
 ```
 
 ## Uso de IA
