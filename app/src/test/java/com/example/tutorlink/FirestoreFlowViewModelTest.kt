@@ -53,6 +53,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Assert.assertSame
 import org.junit.Before
 import org.junit.Test
+import com.example.tutorlink.domain.reporting.ErrorReporter
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class FirestoreFlowViewModelTest {
@@ -64,6 +65,7 @@ class FirestoreFlowViewModelTest {
     private val catalog = FakeCatalogRepository()
     private val sessions = FakeSessionRepository()
     private val searchHistory = FakeSearchHistoryRepository()
+    private val errorReporter = FakeErrorReporter()
 
     @Before
     fun setUp() { Dispatchers.setMain(dispatcher) }
@@ -136,6 +138,7 @@ class FirestoreFlowViewModelTest {
         screens.home.retryLoading()
         runCurrent()
         assertEquals(UiLoadState.CONTENT, screens.home.uiState.value.loadState)
+        assertTrue(errorReporter.reportedErrors.any { (_, operation) -> operation == "catalog.observe.timeout" })
     }
 
     @Test
@@ -153,6 +156,7 @@ class FirestoreFlowViewModelTest {
         auth.userId.value = "student-2"
         runCurrent()
         assertEquals(UiLoadState.ERROR, screens.search.uiState.value.loadState)
+        assertTrue(errorReporter.reportedErrors.any { (_, operation) -> operation == "catalog.observe" })
     }
 
     @Test
@@ -228,6 +232,7 @@ class FirestoreFlowViewModelTest {
         users.failure = IllegalStateException("offline without cached profile")
         val screens = createScreens()
         runCurrent()
+        assertTrue(errorReporter.reportedErrors.any { (_, operation) -> operation == "users.observeProfile" })
         assertNull(screens.home.uiState.value.userName)
         assertEquals(UiLoadState.CONTENT, screens.home.uiState.value.loadState)
         fillBooking(screens.detail)
@@ -387,7 +392,7 @@ class FirestoreFlowViewModelTest {
     }
 
     private fun createScreens(
-        repository: TutorLinkRepository = TutorLinkRepositoryImpl(catalog, sessions, auth, users, repositoryScope)
+        repository: TutorLinkRepository = TutorLinkRepositoryImpl(catalogRepository = catalog, sessionRepository = sessions, authRepository = auth, userRepository = users, errorReporter = errorReporter, scope = repositoryScope)
     ): Screens {
         val provider = ViewModelProvider(viewModelStore, ScreenViewModelFactory(repository, sessions, searchHistory))
         return Screens(provider[HomeViewModel::class.java], provider[SearchViewModel::class.java],
@@ -488,4 +493,12 @@ private class FakeSessionRepository : SessionRepository {
     }
     override suspend fun updateSessionStatus(sessionId: String, status: TutoringStatus) = Result.success(Unit)
     override suspend fun deleteSession(sessionId: String) = Result.success(Unit)
+}
+
+private class FakeErrorReporter : ErrorReporter {
+    val reportedErrors = mutableListOf<Pair<Throwable, String>>()
+    override fun recordNonFatal(
+        throwable: Throwable,
+        operation: String
+    ) { reportedErrors += throwable to operation }
 }

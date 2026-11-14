@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.services)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.firebase.crashlytics)
 }
 
 android {
@@ -56,6 +57,7 @@ dependencies {
     implementation(libs.firebase.firestore)
     implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.androidx.room3.runtime)
+    implementation(libs.firebase.crashlytics)
     ksp(libs.androidx.room3.compiler)
     implementation(libs.androidx.sqlite.bundled)
     implementation(libs.androidx.datastore.preferences)

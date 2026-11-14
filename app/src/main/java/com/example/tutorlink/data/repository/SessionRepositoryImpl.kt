@@ -11,9 +11,11 @@ import kotlinx.coroutines.CancellationException
 import com.example.tutorlink.domain.repository.SessionRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import com.example.tutorlink.domain.reporting.ErrorReporter
 
 class SessionRepositoryImpl(
-    private val remoteDataSource: SessionRemoteDataSource
+    private val remoteDataSource: SessionRemoteDataSource,
+    private val errorReporter: ErrorReporter
 ) : SessionRepository {
 
     override fun observeMySessions(): Flow<List<TutoringSession>> =
@@ -27,10 +29,16 @@ class SessionRepositoryImpl(
         session: TutoringSession
     ): Result<SessionWriteResult> = try {
         BookingValidator.validate(session)
-        Result.success(remoteDataSource.createSession(session.toDto()))
+        Result.success(
+            remoteDataSource.createSession(session.toDto())
+        )
     } catch (exception: CancellationException) {
         throw exception
     } catch (exception: Exception) {
+        errorReporter.recordNonFatal(
+            throwable = exception,
+            operation = "sessions.create"
+        )
         Result.failure(exception)
     }
 
@@ -42,9 +50,23 @@ class SessionRepositoryImpl(
             sessionId = sessionId,
             status = status.name
         )
+    }.onFailure { throwable ->
+        if (throwable !is CancellationException) {
+            errorReporter.recordNonFatal(
+                throwable = throwable,
+                operation = "sessions.updateStatus"
+            )
+        }
     }
 
     override suspend fun deleteSession(
         sessionId: String
-    ): Result<Unit> = runCatching { remoteDataSource.deleteSession(sessionId) }
+    ): Result<Unit> = runCatching { remoteDataSource.deleteSession(sessionId) }.onFailure { throwable ->
+        if (throwable !is CancellationException) {
+            errorReporter.recordNonFatal(
+                throwable = throwable,
+                operation = "sessions.delete"
+            )
+        }
+    }
 }

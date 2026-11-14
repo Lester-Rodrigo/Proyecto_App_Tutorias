@@ -6,10 +6,13 @@ import com.example.tutorlink.data.remote.firestore.UserRemoteDataSource
 import com.example.tutorlink.domain.repository.AuthRepository
 import com.google.firebase.Timestamp
 import kotlinx.coroutines.flow.Flow
+import com.example.tutorlink.domain.reporting.ErrorReporter
+import kotlinx.coroutines.CancellationException
 
 class AuthRepositoryImpl(
     private val authRemoteDataSource: AuthRemoteDataSource,
-    private val userRemoteDataSource: UserRemoteDataSource
+    private val userRemoteDataSource: UserRemoteDataSource,
+    private val errorReporter: ErrorReporter
 ) : AuthRepository {
     override val currentUserId: Flow<String?> = authRemoteDataSource.currentUserId
 
@@ -22,6 +25,7 @@ class AuthRepositoryImpl(
             email = email.trim(),
             password = password
         )
+
         userRemoteDataSource.saveUser(
             UserDto(
                 id = userId,
@@ -32,6 +36,13 @@ class AuthRepositoryImpl(
                 createdAt = Timestamp.now()
             )
         )
+    }.onFailure { throwable ->
+        if (throwable !is CancellationException) {
+            errorReporter.recordNonFatal(
+                throwable = throwable,
+                operation = "auth.register"
+            )
+        }
     }
 
     override suspend fun signIn(
@@ -42,6 +53,13 @@ class AuthRepositoryImpl(
             email = email.trim(),
             password = password
         )
+    }.onFailure { throwable ->
+        if (throwable !is CancellationException) {
+            errorReporter.recordNonFatal(
+                throwable = throwable,
+                operation = "auth.signIn"
+            )
+        }
     }
 
     override suspend fun signOut() { authRemoteDataSource.signOut() }

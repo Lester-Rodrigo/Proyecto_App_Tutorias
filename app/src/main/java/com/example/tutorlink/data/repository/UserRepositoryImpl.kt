@@ -7,9 +7,12 @@ import com.example.tutorlink.domain.model.UserProfile
 import com.example.tutorlink.domain.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import com.example.tutorlink.domain.reporting.ErrorReporter
+import kotlinx.coroutines.CancellationException
 
 class UserRepositoryImpl(
-    private val remoteDataSource: UserRemoteDataSource
+    private val remoteDataSource: UserRemoteDataSource,
+    private val errorReporter: ErrorReporter
 ) : UserRepository {
 
     override fun observeCurrentUserProfile(): Flow<UserProfile?> =
@@ -17,5 +20,12 @@ class UserRepositoryImpl(
 
     override suspend fun updateProfile(
         profile: UserProfile
-    ): Result<Unit> = runCatching { remoteDataSource.updateUser(profile.toDto()) }
+    ): Result<Unit> = runCatching { remoteDataSource.updateUser(profile.toDto()) }.onFailure { throwable ->
+        if (throwable !is CancellationException) {
+            errorReporter.recordNonFatal(
+                throwable = throwable,
+                operation = "users.updateProfile"
+            )
+        }
+    }
 }
