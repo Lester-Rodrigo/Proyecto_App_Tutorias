@@ -80,7 +80,9 @@ APK: `app/build/outputs/final/TutorLink-1.2-3.apk`.
 - [Captura de publicación](evidencias/app-distribution-1.2-publicada.jpg). Esta captura prueba versión, distribución y notas; **no acredita las dos descargas externas requeridas**.
 - La clasificación de los verificadores por rol se omitió a petición del usuario.
 - `adb devices` no detectó dispositivos; la validación en dispositivo y de actualización permanece pendiente.
-- Pendiente: dos testers externos deben descargar e instalar **1.2 (3)**, y luego guardar una captura actualizada donde se vean esas dos descargas. La evidencia de Crashlytics del build distribuido también requiere ejecutarlo y generar un evento no fatal real; no se presenta como obtenida.
+- Pendiente: dos testers externos deben descargar e instalar **1.2 (3)**, y luego guardar una captura actualizada donde se vean esas dos descargas.
+- [Evento no fatal real de 1.2 (3), captura y explicación](crashlytics.md): obtenido sobre el APK publicado intacto, con SHA-256 verificado. Firebase muestra un error recuperable por credenciales inválidas; decisión: esperado.
+- [PDF de diapositivas, video continuo de respaldo y guion](demo/README.md). Las dos pruebas instrumentadas de evidencia (error no fatal y flujo principal) terminaron con `OK (1 test)` cada una. Esta nueva ejecución no repite toda la matriz manual de rotación, temas y modo avión.
 
 ## Referencias
 
