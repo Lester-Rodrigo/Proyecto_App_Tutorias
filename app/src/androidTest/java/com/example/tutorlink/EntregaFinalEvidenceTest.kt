@@ -2,6 +2,7 @@ package com.example.tutorlink
 
 import android.graphics.Bitmap
 import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -29,8 +30,9 @@ class EntregaFinalEvidenceTest {
     private fun enabled() {
         assumeTrue(InstrumentationRegistry.getArguments().getString("finalEvidence") == "true")
         val info = instrumentation.targetContext.packageManager.getPackageInfo("com.example.app_tutorias", 0)
-        assertEquals("1.2", info.versionName)
-        assertEquals(3L, info.longVersionCode)
+        val args = InstrumentationRegistry.getArguments()
+        assertEquals(args.getString("expectedVersion") ?: "1.2", info.versionName)
+        assertEquals((args.getString("expectedVersionCode") ?: "3").toLong(), info.longVersionCode)
     }
     private fun waitText(text: String, timeout: Long = 45_000) = rule.waitUntil(timeout) {
         rule.onAllNodes(hasText(text, substring = true)).fetchSemanticsNodes().isNotEmpty()
@@ -65,7 +67,7 @@ class EntregaFinalEvidenceTest {
         }
         assertTrue("Expected invalid-credentials failure", result.isFailure)
         File(output, "non-fatal.txt").writeText(
-            "version=1.2 (3)\noperation=auth.signIn\nexception=${result.exceptionOrNull()?.javaClass?.name}\n" +
+            "version=${versionLabel()}\noperation=auth.signIn\nexception=${result.exceptionOrNull()?.javaClass?.name}\n" +
                 "expected=true\nobservedAt=${java.time.Instant.now()}\n"
         )
         Thread.sleep(8_000)
@@ -103,7 +105,33 @@ class EntregaFinalEvidenceTest {
         waitText("Mis tutorías")
         waitText("Resolución de ecuaciones cuadráticas")
         shot("06-calendario")
-        File(output, "demo.txt").writeText("version=1.2 (3)\nstatus=PASS\nrecordedAt=${java.time.Instant.now()}\n")
+        File(output, "demo.txt").writeText("version=${versionLabel()}\nstatus=PASS\nrecordedAt=${java.time.Instant.now()}\n")
         Thread.sleep(4_000)
+    }
+
+    @Test fun crossReviewCategoryAndPastTime() {
+        enabled()
+        assertNotNull("Run the demo first to prepare the dedicated account", FirebaseAuth.getInstance().currentUser)
+        waitText("Ana Morales", 60_000)
+        val inCategoryRow = hasAnyAncestor(SemanticsMatcher.keyIsDefined(SemanticsProperties.HorizontalScrollAxisRange))
+        rule.onNode(hasText("Matemáticas", substring = true) and hasClickAction() and inCategoryRow)
+            .performSemanticsAction(SemanticsActions.OnClick) { it() }
+        waitText("Encuentra tu tutor")
+        rule.onNode(hasText("Matemáticas") and SemanticsMatcher.keyIsDefined(SemanticsProperties.Selected)).assertIsSelected()
+        rule.onNodeWithText("Ana Morales").assertExists()
+        shot("07-filtro-desde-inicio")
+        click("Ana Morales")
+        field("Materia o tema", "Álgebra lineal")
+        field("Fecha", LocalDate.now().toString())
+        field("Hora", "00:00")
+        waitText("Esa hora ya pasó. Elige una hora futura.")
+        rule.onAllNodes(hasScrollAction()).onFirst().performScrollToNode(hasText("Reservar tutoría"))
+        rule.onNodeWithText("Reservar tutoría").assertIsNotEnabled()
+        shot("08-hora-pasada-bloqueada")
+    }
+
+    private fun versionLabel(): String {
+        val info = instrumentation.targetContext.packageManager.getPackageInfo("com.example.app_tutorias", 0)
+        return "${info.versionName} (${info.longVersionCode})"
     }
 }

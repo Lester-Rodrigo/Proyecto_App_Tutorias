@@ -6,6 +6,7 @@ import com.example.tutorlink.data.MAX_NOTES_LENGTH
 import com.example.tutorlink.data.normalized
 import com.example.tutorlink.data.validateBookingForm
 import java.time.LocalDate
+import java.time.LocalTime
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -92,6 +93,26 @@ class BookingValidationTest {
         assertEquals(BookingFieldError.INVALID_TIME, result.timeError)
         assertEquals(BookingFieldError.NOTES_TOO_LONG, result.notesError)
         assertFalse(result.isValid)
+    }
+
+    @Test
+    fun `earlier hour and current minute today are rejected with a time error`() {
+        val currentTime = LocalTime.of(12, 30, 20)
+        for (time in listOf("09:00", "12:30")) {
+            val result = validateBookingForm(validForm(time = time), today, currentTime)
+            assertFalse(result.isValid)
+            assertEquals(BookingFieldError.PAST_TIME, result.timeError)
+            assertNull(result.dateError)
+        }
+    }
+
+    @Test
+    fun `later time today and early time on a future date remain valid`() {
+        val currentTime = LocalTime.of(12, 30, 20)
+        assertTrue(validateBookingForm(validForm(time = "12:31"), today, currentTime).isValid)
+        assertTrue(validateBookingForm(validForm(date = "2026-09-21", time = "00:00"), today, currentTime).isValid)
+        assertEquals(BookingFieldError.INVALID_TIME,
+            validateBookingForm(validForm(time = "24:00"), today, currentTime).timeError)
     }
 
     private fun validForm(

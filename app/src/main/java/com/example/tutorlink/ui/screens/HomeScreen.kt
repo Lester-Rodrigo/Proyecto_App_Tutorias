@@ -45,6 +45,7 @@ fun HomeScreen(
     recommendedTutors: List<Tutor>,
     nextSession: TutoringSession?,
     onSearchClick: () -> Unit,
+    onCategoryClick: (String) -> Unit,
     onTutorClick: (Tutor) -> Unit,
     onCalendarClick: () -> Unit,
     loadState: UiLoadState = UiLoadState.CONTENT,
@@ -118,7 +119,7 @@ fun HomeScreen(
             LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 items(categories, key = { it.id }) { category ->
                     Surface(
-                        modifier = Modifier.clickable(onClick = onSearchClick),
+                        modifier = Modifier.clickable { onCategoryClick(category.id) },
                         shape = CircleShape,
                         color = MaterialTheme.colorScheme.primaryContainer
                     ) {
@@ -180,6 +181,7 @@ private fun HomeScreenPreview() {
             recommendedTutors = MockData.tutors.take(2),
             nextSession = MockData.initialSessions().first(),
             onSearchClick = {},
+            onCategoryClick = {},
             onTutorClick = {},
             onCalendarClick = {}
         )

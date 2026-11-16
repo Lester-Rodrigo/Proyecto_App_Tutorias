@@ -1,6 +1,7 @@
 package com.example.tutorlink.data
 
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.format.DateTimeParseException
 
 data class BookingFormData(
@@ -23,6 +24,7 @@ enum class BookingFieldError {
     INVALID_DATE,
     PAST_DATE,
     INVALID_TIME,
+    PAST_TIME,
     NOTES_TOO_LONG
 }
 
@@ -39,7 +41,8 @@ data class BookingValidationResult(
 
 fun validateBookingForm(
     form: BookingFormData,
-    today: LocalDate = LocalDate.now()
+    today: LocalDate = LocalDate.now(),
+    currentTime: LocalTime = LocalTime.now()
 ): BookingValidationResult {
     val normalizedForm = form.normalized()
 
@@ -65,6 +68,8 @@ fun validateBookingForm(
     val timeError = when {
         normalizedForm.time.isBlank() -> BookingFieldError.REQUIRED
         !TIME_PATTERN.matches(normalizedForm.time) -> BookingFieldError.INVALID_TIME
+        dateError == null && LocalDate.parse(normalizedForm.date) == today &&
+            !LocalTime.parse(normalizedForm.time).isAfter(currentTime) -> BookingFieldError.PAST_TIME
         else -> null
     }
 

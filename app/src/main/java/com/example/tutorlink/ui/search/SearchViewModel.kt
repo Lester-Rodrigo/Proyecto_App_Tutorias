@@ -65,6 +65,10 @@ class SearchViewModel(
         _uiState.update { it.copy(selectedCategoryId = if (categoryId == it.selectedCategoryId) null else categoryId) }
         refreshState()
     }
+    fun onHomeCategorySelected(categoryId: String) {
+        _uiState.update { it.copy(query = "", selectedCategoryId = categoryId) }
+        refreshState()
+    }
     fun clearSearchHistory() { runHistoryWrite { searchHistoryRepository.clearHistory() } }
     private fun saveSearch(query: String) {
         if (query.isNotBlank()) runHistoryWrite { searchHistoryRepository.saveSearch(query) }

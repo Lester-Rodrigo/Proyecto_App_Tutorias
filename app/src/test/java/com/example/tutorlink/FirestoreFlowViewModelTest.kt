@@ -293,6 +293,23 @@ class FirestoreFlowViewModelTest {
     }
 
     @Test
+    fun `home category clears stale query filters tutors and repeated selection stays selected`() = runTest(dispatcher) {
+        catalog.tutorFlow = flowOf(listOf(catalog.tutor,
+            catalog.tutor.copy(id = "language-tutor", name = "Tutora de idiomas", subjectIds = listOf("languages"))))
+        val screens = createScreens()
+        runCurrent()
+        screens.search.onSearchQueryChanged("idiomas")
+        screens.search.onSearchCategorySelected("languages")
+        screens.search.onHomeCategorySelected("math")
+        assertEquals("", screens.search.uiState.value.query)
+        assertEquals("math", screens.search.uiState.value.selectedCategoryId)
+        assertEquals(listOf("tutor-1"), screens.search.uiState.value.filteredTutors.map { it.id })
+        screens.search.onHomeCategorySelected("math")
+        assertEquals("math", screens.search.uiState.value.selectedCategoryId)
+        assertEquals(listOf("tutor-1"), screens.search.uiState.value.filteredTutors.map { it.id })
+    }
+
+    @Test
     fun `four screens share authenticated reads and retry replaces the listeners`() = runTest(dispatcher) {
         val screens = createScreens()
         runCurrent()

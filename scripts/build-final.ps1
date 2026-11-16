@@ -40,8 +40,11 @@ try {
         if ($LASTEXITCODE -ne 0) { throw 'No se pudo verificar la firma del APK.' }
         $outputDirectory = Join-Path $sourceRoot 'app\build\outputs\final'
         New-Item -ItemType Directory -Path $outputDirectory -Force | Out-Null
-        Copy-Item -LiteralPath $apk -Destination (Join-Path $outputDirectory 'TutorLink-1.2-3.apk') -Force
-        Get-FileHash -LiteralPath (Join-Path $outputDirectory 'TutorLink-1.2-3.apk') -Algorithm SHA256
+        $metadata = Get-Content -LiteralPath (Join-Path (Split-Path $apk -Parent) 'output-metadata.json') -Raw | ConvertFrom-Json
+        $version = $metadata.elements[0]
+        $versionedApk = Join-Path $outputDirectory ("TutorLink-{0}-{1}.apk" -f $version.versionName, $version.versionCode)
+        Copy-Item -LiteralPath $apk -Destination $versionedApk -Force
+        Get-FileHash -LiteralPath $versionedApk -Algorithm SHA256
     }
     Write-Host "Compilacion e informes disponibles en $buildRoot"
 } finally {

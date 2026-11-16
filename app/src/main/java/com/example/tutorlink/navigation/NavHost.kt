@@ -143,6 +143,12 @@ fun TutorLinkNavHost(appContainer: AppContainer, darkModeEnabled: Boolean, onDar
                             launchSingleTop = true
                         }
                     },
+                    onCategoryClick = { categoryId ->
+                        searchViewModel.onHomeCategorySelected(categoryId)
+                        navController.navigate(Destination.Search.route) {
+                            launchSingleTop = true
+                        }
+                    },
                     onTutorClick = { tutor ->
                         navController.navigate(
                             Destination.TutorDetail.createRoute(tutor.id)

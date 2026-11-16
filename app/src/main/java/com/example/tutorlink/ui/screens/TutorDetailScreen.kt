@@ -341,6 +341,7 @@ private fun BookingFieldError?.errorMessage(): String? = when (this) {
     BookingFieldError.INVALID_DATE -> stringResource(R.string.error_invalid_date)
     BookingFieldError.PAST_DATE -> stringResource(R.string.error_past_date)
     BookingFieldError.INVALID_TIME -> stringResource(R.string.error_invalid_time)
+    BookingFieldError.PAST_TIME -> stringResource(R.string.error_past_time)
     BookingFieldError.NOTES_TOO_LONG -> stringResource(R.string.error_notes_too_long)
     null -> null
 }
