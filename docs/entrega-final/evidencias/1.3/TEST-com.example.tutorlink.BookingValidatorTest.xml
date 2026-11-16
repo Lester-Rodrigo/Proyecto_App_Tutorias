@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.tutorlink.BookingValidatorTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-16T05:02:40.171Z" hostname="AYZERY" time="0.011">
+  <properties/>
+  <testcase name="negative duration is rejected" classname="com.example.tutorlink.BookingValidatorTest" time="0.007"/>
+  <testcase name="positive duration below one minute is accepted without truncation" classname="com.example.tutorlink.BookingValidatorTest" time="0.0"/>
+  <testcase name="zero minute duration is rejected" classname="com.example.tutorlink.BookingValidatorTest" time="0.001"/>
+  <testcase name="sixty minute duration is accepted" classname="com.example.tutorlink.BookingValidatorTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

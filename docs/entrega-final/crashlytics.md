@@ -1,5 +1,7 @@
 # Evidencia no fatal del build distribuido
 
+**Build actual: 1.3 (4).** [Evento no fatal, captura y pruebas de la actualización del cross-review](release-1.3.md#publicación-y-monitoreo). La evidencia 1.2 de este documento se conserva como histórica.
+
 ## Evento real
 
 - Aplicación: `com.example.app_tutorias`.

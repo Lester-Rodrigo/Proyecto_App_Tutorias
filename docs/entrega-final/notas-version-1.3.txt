@@ -1,0 +1,7 @@
+TutorLink 1.3 (4) - Correcciones del cross-review
+
+- El formulario rechaza una hora pasada o el minuto actual al reservar para hoy, muestra el error junto al campo y bloquea el envío.
+- Las materias populares de Inicio abren Buscar con la materia elegida. Se limpia la búsqueda anterior y volver a pulsar la misma materia conserva el filtro.
+- Se verifica la corrección anterior de disponibilidad: solo se muestran horarios publicados por el tutor; si faltan, la app lo indica.
+
+Se conservan el catálogo, las reservas y el historial local. Requiere Android 16 (API 36) o superior. Actualización firmada con la misma clave que 1.2.

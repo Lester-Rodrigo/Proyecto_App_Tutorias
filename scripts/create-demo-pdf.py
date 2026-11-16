@@ -8,7 +8,7 @@ from reportlab.lib.utils import ImageReader, simpleSplit
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / 'docs/entrega-final/demo'
-IMAGES = ROOT / 'docs/entrega-final/evidencias/dispositivo'
+IMAGES = ROOT / 'docs/entrega-final/evidencias/1.3/dispositivo'
 OUT.mkdir(parents=True, exist_ok=True)
 FONT = ROOT / 'app/src/main/res/font'
 pdfmetrics.registerFont(TTFont('Inter', str(FONT / 'inter_regular.ttf')))
@@ -17,7 +17,7 @@ pdfmetrics.registerFont(TTFont('Outfit', str(FONT / 'outfit_semibold.ttf')))
 W, H = 1280, 720
 BG, FG, MUTED, GREEN = map(HexColor, ['#F7F9F7', '#181D16', '#3F4A3D', '#006E20'])
 pdf = canvas.Canvas(str(OUT / 'diapositivas-tutorlink.pdf'), pagesize=(W, H))
-pdf.setTitle('TutorLink - Demo final 1.2 (3)')
+pdf.setTitle('TutorLink - Demo final 1.3 (4)')
 pdf.setAuthor('Equipo TutorLink')
 
 def text(value, x, y, size=26, width=900, color=FG, font='Inter', leading=None):
@@ -33,7 +33,7 @@ def base(number, section, title):
     pdf.rect(0, 0, W, H, stroke=0, fill=1)
     text(section.upper(), 72, 655, 15, color=GREEN, font='InterBold')
     text(title, 72, 595, 42, width=1136, font='Outfit')
-    text('TutorLink  /  Entrega final  /  1.2 (3)', 72, 29, 12, color=MUTED)
+    text('TutorLink  /  Entrega final  /  1.3 (4)', 72, 29, 12, color=MUTED)
     pdf.drawRightString(1208, 29, f'{number:02d} / 08')
 
 def image(path, x, y, max_w, max_h):
@@ -90,10 +90,10 @@ text('StateFlow conserva el estado; los Composables reciben datos y callbacks.',
 pdf.showPage()
 
 base(7, 'Calidad y distribución', 'Un build firmado y disponible para pruebas')
-text('28 pruebas unitarias aprobadas', 72, 472, 31, font='InterBold')
+text('31 pruebas unitarias aprobadas', 72, 472, 31, font='InterBold')
 text('Build debug y release verificados; lint sin errores.', 72, 420, 25, width=1080)
-text('Firebase App Distribution: 1.2 (3)', 72, 327, 31, color=GREEN, font='InterBold')
-text('Misma clave que 1.0 y notas de versión publicadas.', 72, 275, 25, width=1080)
+text('Firebase App Distribution: 1.3 (4)', 72, 327, 31, color=GREEN, font='InterBold')
+text('Correcciones del cross-review y misma clave que 1.0.', 72, 275, 25, width=1080)
 text('Crashlytics registra como no fatales los errores capturados por los repositorios.', 72, 179, 25, width=1080)
 text('Fuentes: informes JUnit, lint, firma y distribución en docs/entrega-final/evidencias/.', 72, 89, 14, color=MUTED)
 pdf.showPage()

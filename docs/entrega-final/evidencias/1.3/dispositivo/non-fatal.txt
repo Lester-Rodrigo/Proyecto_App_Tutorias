@@ -1,0 +1,5 @@
+version=1.3 (4)
+operation=auth.signIn
+exception=com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+expected=true
+observedAt=2026-11-16T05:12:43.627379Z

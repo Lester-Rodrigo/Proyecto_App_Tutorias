@@ -1,5 +1,7 @@
 # Persona 3: build final y App Distribution
 
+**Actualización vigente: [1.3 (4), con las correcciones del cross-review](release-1.3.md).** El registro de 1.2 (3) que sigue se conserva como histórico. Para el build actual, consultar las nuevas notas, firma, pruebas y capturas enlazadas en la actualización.
+
 Fecha de preparación: 15 de noviembre de 2026 (Guatemala).
 Base remota verificada: `origin/entrega-final`, commit `25c1064`.
 Esa base ya integra las correcciones de `fix/entrega-final-observaciones`, Crashlytics y el README final.
