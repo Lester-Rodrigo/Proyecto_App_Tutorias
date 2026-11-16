@@ -178,7 +178,7 @@ congelado está en [docs/entrega-4/alcance.md](docs/entrega-4/alcance.md).
 
 ### Uso de IA
 
-**Herramienta:** Claude (Anthropic), mediante Claude Code.
+
 
 | Para qué se utilizó | Cómo se verificó |
 |---|---|
