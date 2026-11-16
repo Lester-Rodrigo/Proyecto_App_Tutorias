@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">TutorLink</string>
-    <string name="home_greeting">¡Hola, Andrea!</string>
+    <string name="home_greeting">¡Hola, %1$s!</string>
+    <string name="home_greeting_generic">¡Hola!</string>
+    <string name="no_available_times">No hay horarios publicados. Consulta la disponibilidad con el tutor.</string>
     <string name="home_subtitle">¿Qué quieres aprender hoy?</string>
     <string name="search_hint">Busca por tutor o materia</string>
     <string name="popular_subjects">Materias populares</string>
@@ -43,6 +45,7 @@
     <string name="error_invalid_date">Usa una fecha válida con formato AAAA-MM-DD.</string>
     <string name="error_past_date">La fecha no puede estar en el pasado.</string>
     <string name="error_invalid_time">Usa una hora válida con formato HH:MM.</string>
+    <string name="error_past_time">Esa hora ya pasó. Elige una hora futura.</string>
     <string name="error_notes_too_long">Las notas no pueden superar 250 caracteres.</string>
     <string name="calendar_title">Mis tutorías</string>
     <string name="calendar_subtitle">Consulta y organiza tus sesiones de aprendizaje.</string>

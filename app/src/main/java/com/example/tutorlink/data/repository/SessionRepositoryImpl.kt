@@ -1,0 +1,72 @@
+package com.example.tutorlink.data.repository
+
+import com.example.tutorlink.data.mapper.toDomain
+import com.example.tutorlink.data.mapper.toDto
+import com.example.tutorlink.data.remote.firestore.SessionRemoteDataSource
+import com.example.tutorlink.domain.model.TutoringSession
+import com.example.tutorlink.domain.model.TutoringStatus
+import com.example.tutorlink.domain.model.SessionWriteResult
+import com.example.tutorlink.domain.validation.BookingValidator
+import kotlinx.coroutines.CancellationException
+import com.example.tutorlink.domain.repository.SessionRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import com.example.tutorlink.domain.reporting.ErrorReporter
+
+class SessionRepositoryImpl(
+    private val remoteDataSource: SessionRemoteDataSource,
+    private val errorReporter: ErrorReporter
+) : SessionRepository {
+
+    override fun observeMySessions(): Flow<List<TutoringSession>> =
+        remoteDataSource.observeMySessions().map { sessions ->
+            sessions
+                .map { it.toDomain() }
+                .sortedBy { it.startAt }
+        }
+
+    override suspend fun createSession(
+        session: TutoringSession
+    ): Result<SessionWriteResult> = try {
+        BookingValidator.validate(session)
+        Result.success(
+            remoteDataSource.createSession(session.toDto())
+        )
+    } catch (exception: CancellationException) {
+        throw exception
+    } catch (exception: Exception) {
+        errorReporter.recordNonFatal(
+            throwable = exception,
+            operation = "sessions.create"
+        )
+        Result.failure(exception)
+    }
+
+    override suspend fun updateSessionStatus(
+        sessionId: String,
+        status: TutoringStatus
+    ): Result<Unit> = runCatching {
+        remoteDataSource.updateSessionStatus(
+            sessionId = sessionId,
+            status = status.name
+        )
+    }.onFailure { throwable ->
+        if (throwable !is CancellationException) {
+            errorReporter.recordNonFatal(
+                throwable = throwable,
+                operation = "sessions.updateStatus"
+            )
+        }
+    }
+
+    override suspend fun deleteSession(
+        sessionId: String
+    ): Result<Unit> = runCatching { remoteDataSource.deleteSession(sessionId) }.onFailure { throwable ->
+        if (throwable !is CancellationException) {
+            errorReporter.recordNonFatal(
+                throwable = throwable,
+                operation = "sessions.delete"
+            )
+        }
+    }
+}

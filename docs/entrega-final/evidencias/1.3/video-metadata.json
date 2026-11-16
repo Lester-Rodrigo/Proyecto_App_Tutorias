@@ -1,0 +1,12 @@
+{
+  "file": "demo/video-respaldo.mp4",
+  "durationSeconds": 37.93,
+  "width": 720,
+  "height": 1600,
+  "fps": 30,
+  "continuous": true,
+  "cuts": false,
+  "speedChanged": false,
+  "audio": false,
+  "appVersion": "1.3 (4)"
+}

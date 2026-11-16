@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.tutorlink.BookingValidationTest" tests="7" skipped="0" failures="0" errors="0" timestamp="2026-11-16T05:02:40.003Z" hostname="AYZERY" time="0.16">
+  <properties/>
+  <testcase name="past or malformed dates are rejected" classname="com.example.tutorlink.BookingValidationTest" time="0.07"/>
+  <testcase name="valid required fields enable booking" classname="com.example.tutorlink.BookingValidationTest" time="0.003"/>
+  <testcase name="empty form is invalid and disables booking" classname="com.example.tutorlink.BookingValidationTest" time="0.001"/>
+  <testcase name="leading and trailing whitespace is accepted and normalized" classname="com.example.tutorlink.BookingValidationTest" time="0.0"/>
+  <testcase name="later time today and early time on a future date remain valid" classname="com.example.tutorlink.BookingValidationTest" time="0.002"/>
+  <testcase name="earlier hour and current minute today are rejected with a time error" classname="com.example.tutorlink.BookingValidationTest" time="0.039"/>
+  <testcase name="short topic invalid time and long notes are rejected" classname="com.example.tutorlink.BookingValidationTest" time="0.001"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

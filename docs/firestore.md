@@ -5,7 +5,8 @@ No necesita una cuenta de servicio ni claves de administrador dentro de la app.
 
 ## Flujo conectado
 
-- Después de iniciar sesión, `TutorLinkViewModel` observa el catálogo y las sesiones mediante los repositorios inyectados.
+- Después de iniciar sesión, `HomeViewModel`, `SearchViewModel`, `CalendarViewModel` y `TutorDetailViewModel` reciben los datos mediante `TutorLinkRepository`, inyectado desde `AppContainer`. El repositorio comparte las lecturas de catálogo, perfil y sesiones entre las pantallas.
+- El saludo usa el nombre de `users/{uid}`; si falta el perfil o el nombre, muestra «¡Hola!». El detalle muestra únicamente los horarios del campo `availability`; si está vacío, informa que no hay horarios publicados. No se inventan horarios ni se modifica el esquema de Firestore.
 - `CatalogRepository` lee `subjects` y `tutors`, y convierte los documentos a modelos de dominio.
 - Reservar llama a `SessionRepository.createSession()`. El calendario observa `sessions`, filtrando por `studentId` del usuario autenticado.
 - Los datos mock quedan para previews y pruebas; no alimentan el flujo principal.

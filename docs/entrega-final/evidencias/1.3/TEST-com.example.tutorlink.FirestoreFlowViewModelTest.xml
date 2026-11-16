@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.tutorlink.FirestoreFlowViewModelTest" tests="17" skipped="0" failures="0" errors="0" timestamp="2026-11-16T05:02:40.213Z" hostname="AYZERY" time="1.098">
+  <properties/>
+  <testcase name="reusing the owner retains search filter calendar selection and booking form" classname="com.example.tutorlink.FirestoreFlowViewModelTest" time="0.635"/>
+  <testcase name="shared reads stop after owners clear and restart without stale account data" classname="com.example.tutorlink.FirestoreFlowViewModelTest" time="0.06"/>
+  <testcase name="catalog error is visible and signing out clears previous account data" classname="com.example.tutorlink.FirestoreFlowViewModelTest" time="0.074"/>
+  <testcase name="home category clears stale query filters tutors and repeated selection stays selected" classname="com.example.tutorlink.FirestoreFlowViewModelTest" time="0.021"/>
+  <testcase name="greeting follows profile updates and clears when changing accounts" classname="com.example.tutorlink.FirestoreFlowViewModelTest" time="0.031"/>
+  <testcase name="profile error does not block catalog or booking and retry restores the name" classname="com.example.tutorlink.FirestoreFlowViewModelTest" time="0.039"/>
+  <testcase name="submitted searches are saved in history and can be reused" classname="com.example.tutorlink.FirestoreFlowViewModelTest" time="0.024"/>
+  <testcase name="missing first snapshot stops loading and can recover" classname="com.example.tutorlink.FirestoreFlowViewModelTest" time="0.027"/>
+  <testcase name="four screens share authenticated reads and retry replaces the listeners" classname="com.example.tutorlink.FirestoreFlowViewModelTest" time="0.023"/>
+  <testcase name="pending write is distinguished from server confirmation" classname="com.example.tutorlink.FirestoreFlowViewModelTest" time="0.012"/>
+  <testcase name="changing accounts cancels an in flight booking and clears screen state" classname="com.example.tutorlink.FirestoreFlowViewModelTest" time="0.03"/>
+  <testcase name="detail availability follows repository snapshots without fabricated times" classname="com.example.tutorlink.FirestoreFlowViewModelTest" time="0.05"/>
+  <testcase name="profile deadline keeps catalog usable and a later cached snapshot updates the name" classname="com.example.tutorlink.FirestoreFlowViewModelTest" time="0.016"/>
+  <testcase name="history stays visible when the catalog cannot load" classname="com.example.tutorlink.FirestoreFlowViewModelTest" time="0.015"/>
+  <testcase name="catalog comes from repository and booking appears through session stream" classname="com.example.tutorlink.FirestoreFlowViewModelTest" time="0.015"/>
+  <testcase name="missing blank or mismatched profile never supplies a greeting name" classname="com.example.tutorlink.FirestoreFlowViewModelTest" time="0.01"/>
+  <testcase name="failed write shows error and never confirms booking" classname="com.example.tutorlink.FirestoreFlowViewModelTest" time="0.012"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

@@ -1,0 +1,9 @@
+TutorLink 1.2 (3) — Entrega final
+
+- Inicio muestra el nombre de la cuenta y el detalle presenta la disponibilidad publicada del tutor.
+- Inicio, búsqueda, calendario y detalle tienen ViewModels propios y comparten las lecturas autenticadas.
+- Correcciones de convenciones, componentes sin uso y parámetros de las barras de navegación.
+- Integración de Crashlytics para registrar errores no fatales de los repositorios.
+- Se mantiene la búsqueda por materia, reserva de tutorías, calendario e historial local de búsquedas.
+
+Requiere Android 16 (API 36) o superior. Para actualizar conservando los datos, instalar sobre la versión anterior firmada con la misma clave.
