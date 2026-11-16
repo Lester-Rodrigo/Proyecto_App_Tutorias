@@ -1,0 +1,18 @@
+Verifies
+Verified using v1 scheme (JAR signing): false
+Verified using v2 scheme (APK Signature Scheme v2): true
+Verified using v3 scheme (APK Signature Scheme v3): false
+Verified using v3.1 scheme (APK Signature Scheme v3.1): false
+Verified using v3.2 scheme (APK Signature Scheme v3.2): false
+Verified using v4 scheme (APK Signature Scheme v4): false
+Verified for SourceStamp: false
+Number of signers: 1
+V2 Signer: certificate DN: C=GT, ST=Guatemala, L=Guatemala, O=TutorLink, OU=Desarrollo, CN=LA
+V2 Signer: certificate SHA-256 digest: 97742386bc611d09b7ab4f3a0902fcd9defe239ed6ac4567e76eab13597fd3db
+V2 Signer: certificate SHA-1 digest: 993229ad7502573c00ff6df64b80f61a444314ef
+V2 Signer: certificate MD5 digest: b32163e2172f57530daa7fce30e77a31
+V2 Signer: key algorithm: RSA
+V2 Signer: key size (bits): 2048
+V2 Signer: public key SHA-256 digest: 15bc0fde61cfd33de8ed3a350be1921aea601b976bc2157466b28c4c3dd0a826
+V2 Signer: public key SHA-1 digest: 789a500d97df561c5d2d02f80fb923823d0c37fe
+V2 Signer: public key MD5 digest: b9e8662c238d2fe4f35b743e5b0a8930

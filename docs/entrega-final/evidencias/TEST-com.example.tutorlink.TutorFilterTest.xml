@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.example.tutorlink.TutorFilterTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-11-16T03:02:14.321Z" hostname="AYZERY" time="0.003">
+  <properties/>
+  <testcase name="category and query filters are combined" classname="com.example.tutorlink.TutorFilterTest" time="0.002"/>
+  <testcase name="empty filters return every tutor" classname="com.example.tutorlink.TutorFilterTest" time="0.0"/>
+  <testcase name="query filters by tutor name or specialty ignoring case" classname="com.example.tutorlink.TutorFilterTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

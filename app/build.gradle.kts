@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -5,6 +7,14 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.firebase.crashlytics)
 }
+
+val keystoreProperties = Properties().apply {
+    val propertiesFile = rootProject.file("keystore.properties")
+    if (propertiesFile.isFile) propertiesFile.inputStream().use { load(it) }
+}
+val releaseSigning = listOf("storeFile", "storePassword", "keyAlias", "keyPassword")
+    .associateWith { key -> keystoreProperties.getProperty(key)?.takeIf { it.isNotBlank() } }
+val hasReleaseSigning = releaseSigning.values.all { it != null }
 
 android {
     namespace = "com.example.tutorlink"
@@ -16,14 +26,26 @@ android {
         applicationId = "com.example.app_tutorias"
         minSdk = 36
         targetSdk = 37
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 3
+        versionName = "1.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        if (hasReleaseSigning) {
+            create("release") {
+                storeFile = rootProject.file(releaseSigning.getValue("storeFile")!!)
+                storePassword = releaseSigning.getValue("storePassword")!!
+                keyAlias = releaseSigning.getValue("keyAlias")!!
+                keyPassword = releaseSigning.getValue("keyPassword")!!
+            }
+        }
+    }
+
     buildTypes {
         release {
+            if (hasReleaseSigning) signingConfig = signingConfigs.getByName("release")
             optimization {
                 enable = false
             }
@@ -35,6 +57,17 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+}
+
+// A release must never silently produce an unsigned APK for distribution.
+tasks.matching { it.name == "preReleaseBuild" }.configureEach {
+    val signingConfigured = hasReleaseSigning
+    doFirst {
+        check(signingConfigured) {
+            "Falta keystore.properties con storeFile, storePassword, keyAlias y keyPassword. " +
+                "Usa el tutorlink-release.jks original; no crees una clave nueva."
+        }
     }
 }
 
